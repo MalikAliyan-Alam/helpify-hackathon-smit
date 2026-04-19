@@ -27,21 +27,7 @@ export function AuthProvider({ children }) {
     // Update auth profile
     await updateProfile(user, { displayName: name });
     
-    // Create firestore document
-    const userRef = doc(db, 'users', user.uid);
-    await setDoc(userRef, {
-      uid: user.uid,
-      name,
-      email,
-      skills: [],
-      interests: [],
-      location: '',
-      trustScore: 100, // starting score
-      badges: ['New Member'],
-      contributions: 0,
-      createdAt: new Date()
-    });
-
+    // We will skip Firestore for now as requested to avoid timeouts
     return user;
   }
 
@@ -54,30 +40,48 @@ export function AuthProvider({ children }) {
   }
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
-      try {
-        if (user) {
-          const userRef = doc(db, 'users', user.uid);
-          const userSnap = await getDoc(userRef);
-          if (userSnap.exists()) {
-            setUserData(userSnap.data());
-          }
-        } else {
-          setUserData(null);
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      } finally {
-        setLoading(false);
+      
+      // Since we are skipping dynamic Firestore to fix the timeout,
+      // we just mock the userData if a user is logged in.
+      if (user) {
+        setUserData({
+          name: user.displayName || 'Ayesha Khan',
+          email: user.email,
+          location: 'Karachi',
+          trustScore: 98,
+          contributions: 3,
+          skills: ['Figma', 'UI/UX', 'HTML/CSS'],
+          badges: ['Design Ally', 'Fast Responder']
+        });
+      } else {
+        setUserData(null);
       }
+      
+      setLoading(false);
     });
 
-    return unsubscribe;
+    return () => unsubscribe();
   }, []);
 
   const value = {
     currentUser,
     userData,
     signup,
-   
+    login,
+    logout
+  };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {loading ? (
+        <div className="flex flex-col items-center justify-center min-h-screen bg-[#f6f3eb] gap-4">
+          <div className="w-12 h-12 rounded-xl bg-[#129780] flex items-center justify-center text-white font-bold text-2xl animate-pulse">
+            H
+          </div>
+        </div>
+      ) : children}
+    </AuthContext.Provider>
+  );
+}

@@ -33,7 +33,7 @@ export function Navbar() {
         <div className="w-8 h-8 rounded-lg bg-[#129780] flex items-center justify-center text-white font-bold text-lg">
           H
         </div>
-        <span className="font-bold text-[#2b3231] text-[17px] tracking-tight">HelpHub AI</span>
+        <span className="font-bold text-[#2b3231] text-[17px] tracking-tight">Helplytics AI</span>
       </Link>
 
       <div className="hidden md:flex items-center gap-1">

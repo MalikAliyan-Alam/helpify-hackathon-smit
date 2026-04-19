@@ -15,7 +15,7 @@ export function LandingPage() {
             Find help faster.<br/>Become help that<br/>matters.
           </h1>
           <p className="text-gray-600 text-lg mb-8 max-w-md leading-relaxed">
-            HelpHub AI is a community-powered support network for students, mentors,
+            Helplytics AI is a community-powered support network for students, mentors,
             creators, and builders. Ask for help, offer help, track impact, and let AI surface
             smarter matches across the platform.
           </p>

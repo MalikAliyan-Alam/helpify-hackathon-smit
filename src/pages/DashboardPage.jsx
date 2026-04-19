@@ -2,15 +2,19 @@ import React from 'react';
 import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
+import { useAuth } from '../contexts/AuthContext';
 
 export function DashboardPage() {
+  const { currentUser, userData } = useAuth();
+  const name = userData?.name || currentUser?.displayName || 'Loading...';
+  
   return (
     <div className="flex flex-col gap-8 pb-12">
       {/* Header */}
       <div className="bg-[#2b3231] rounded-[24px] p-10 flex flex-col text-white">
         <p className="text-gray-400 font-bold text-xs uppercase tracking-wider mb-4">DASHBOARD</p>
         <h1 className="text-4xl lg:text-[56px] font-bold tracking-tight mb-4">
-          Welcome back, Ayesha Khan.
+          Welcome back, {name}.
         </h1>
         <p className="text-gray-300 text-lg">
           Your command center for requests, AI insights, helper momentum, and live community activity.

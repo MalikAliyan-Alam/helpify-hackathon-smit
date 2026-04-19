@@ -10,7 +10,7 @@ export function Layout() {
         <Outlet />
       </main>
       <footer className="w-full text-center py-6 text-sm text-gray-500 max-w-7xl mx-auto px-8 border-t border-gray-200/50 mt-12">
-        HelpHub AI is built as a premium-feel, multi-page community support product using HTML, CSS, JavaScript, React, and LocalStorage/Firebase.
+        Helplytics AI is built as a premium-feel, multi-page community support product using HTML, CSS, JavaScript, React, and LocalStorage/Firebase.
       </footer>
     </div>
   );

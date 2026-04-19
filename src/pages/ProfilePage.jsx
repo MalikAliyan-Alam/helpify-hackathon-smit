@@ -76,7 +76,7 @@ export function ProfilePage() {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Name</label>
                 <input 
                   type="text" 
-                  defaultValue="Ayesha Khan" 
+                  defaultValue={name} 
                   className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#129780]"
                 />
               </div>
@@ -84,7 +84,7 @@ export function ProfilePage() {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Location</label>
                 <input 
                   type="text" 
-                  defaultValue="Karachi" 
+                  defaultValue={location} 
                   className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#129780]"
                 />
               </div>

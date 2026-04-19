@@ -12,6 +12,7 @@ import { NotificationsPage } from './pages/NotificationsPage';
 import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
 import { RequestDetailPage } from './pages/RequestDetailPage';
+import { OnboardingPage } from './pages/OnboardingPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Toaster } from 'react-hot-toast';
 
@@ -23,7 +24,27 @@ function PrivateRoute({ children }) {
 function App() {
   return (
     <AuthProvider>
-      <Toaster position="bottom-right" />
+      <Toaster 
+        position="bottom-right" 
+        toastOptions={{
+          style: {
+            background: '#fff',
+            color: '#2b3231',
+            borderRadius: '16px',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+            border: '1px solid #f3f4f6',
+            fontWeight: '500',
+            fontSize: '14px',
+            padding: '12px 20px',
+          },
+          success: {
+            iconTheme: {
+              primary: '#129780',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
@@ -53,6 +74,9 @@ function App() {
             } />
             <Route path="notifications" element={
               <PrivateRoute><NotificationsPage /></PrivateRoute>
+            } />
+            <Route path="onboarding" element={
+              <PrivateRoute><OnboardingPage /></PrivateRoute>
             } />
           </Route>
         </Routes>

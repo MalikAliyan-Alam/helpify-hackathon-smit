@@ -19,7 +19,7 @@ export function SignupPage() {
       setLoading(true);
       await signup(email, password, name);
       toast.success('Account created successfully!');
-      navigate('/dashboard');
+      navigate('/onboarding');
     } catch (err) {
       console.error(err);
       if (err.code === 'auth/email-already-in-use') {
@@ -41,7 +41,7 @@ export function SignupPage() {
       setLoading(true);
       await signInWithGoogle();
       toast.success('Successfully signed in with Google!');
-      navigate('/dashboard');
+      navigate('/onboarding');
     } catch (err) {
       console.error(err);
       toast.error('Failed to sign in with Google.');

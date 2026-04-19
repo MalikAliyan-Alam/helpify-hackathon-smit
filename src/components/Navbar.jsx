@@ -7,6 +7,8 @@ export function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
+  
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
 
   const displayedLinks = currentUser ? [
     { name: 'Dashboard', path: '/dashboard' },
@@ -36,22 +38,24 @@ export function Navbar() {
         <span className="font-bold text-[#2b3231] text-[17px] tracking-tight">Helplytics AI</span>
       </Link>
 
-      <div className="hidden md:flex items-center gap-1">
-        {displayedLinks.map((link) => {
-          const isActive = location.pathname === link.path;
-          return (
-            <Link
-              key={link.name}
-              to={link.path}
-              className={`px-4 py-2 rounded-full text-[15px] font-medium transition-colors ${
-                isActive ? 'bg-[#e3e8e6] text-[#2b3231]' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
-              }`}
-            >
-              {link.name}
-            </Link>
-          );
-        })}
-      </div>
+      {!isAuthPage && (
+        <div className="hidden md:flex items-center gap-1">
+          {displayedLinks.map((link) => {
+            const isActive = location.pathname === link.path;
+            return (
+              <Link
+                key={link.name}
+                to={link.path}
+                className={`px-4 py-2 rounded-full text-[15px] font-medium transition-colors ${
+                  isActive ? 'bg-[#e3e8e6] text-[#2b3231]' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
+                }`}
+              >
+                {link.name}
+              </Link>
+            );
+          })}
+        </div>
+      )}
 
       <div className="flex items-center gap-4">
         {currentUser ? (
@@ -64,14 +68,14 @@ export function Navbar() {
             </Link>
             <Button variant="outline" onClick={handleLogout} className="rounded-full border-gray-200 shadow-sm bg-white font-semibold text-sm h-9">Log out</Button>
           </>
-        ) : (
+        ) : !isAuthPage ? (
           <>
             <Link to="/login" className="text-gray-600 font-semibold hover:text-gray-900 px-4">Log in</Link>
             <Link to="/signup">
               <Button variant="default" className="rounded-full px-6 py-2.5 text-[15px] font-semibold">Join the platform</Button>
             </Link>
           </>
-        )}
+        ) : null}
       </div>
     </nav>
   );

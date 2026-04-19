@@ -1,8 +1,67 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
+import { db } from '../lib/firebase';
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
 
 export function AICenterPage() {
+  const navigate = useNavigate();
+  const [posts, setPosts] = useState([]);
+  const [mentorCount, setMentorCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Fetch posts
+    const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
+    const unsubscribePosts = onSnapshot(q, (snapshot) => {
+      const fetchedPosts = [];
+      snapshot.forEach((doc) => {
+        fetchedPosts.push({ id: doc.id, ...doc.data() });
+      });
+      setPosts(fetchedPosts);
+      setLoading(false);
+    });
+
+    // Fetch users for mentor pool
+    const usersQ = query(collection(db, 'users'));
+    const unsubscribeUsers = onSnapshot(usersQ, (snapshot) => {
+      let trusted = 0;
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.trustScore && data.trustScore >= 90) {
+          trusted++;
+        } else if (!data.trustScore) {
+          trusted++; // Default trust score is 100, so we count them
+        }
+      });
+      setMentorCount(trusted);
+    });
+
+    return () => {
+      unsubscribePosts();
+      unsubscribeUsers();
+    };
+  }, []);
+
+  // Calculate Metrics
+  const openPosts = posts.filter(p => p.status !== 'Solved');
+  
+  const categoryCounts = openPosts.reduce((acc, p) => {
+    if (p.category) acc[p.category] = (acc[p.category] || 0) + 1;
+    return acc;
+  }, {});
+  let mostRequestedCategory = 'General';
+  let maxCount = 0;
+  for (const [cat, count] of Object.entries(categoryCounts)) {
+    if (count > maxCount) {
+      maxCount = count;
+      mostRequestedCategory = cat;
+    }
+  }
+
+  const highUrgencyCount = openPosts.filter(p => p.urgency === 'High').length;
+
   return (
     <div className="flex flex-col gap-8 pb-12">
       {/* Header */}
@@ -21,7 +80,13 @@ export function AICenterPage() {
         <Card className="bg-white border-none shadow-sm rounded-[24px] p-8 flex flex-col justify-between">
           <div>
             <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-4">TREND PULSE</p>
-            <h3 className="text-3xl font-bold text-[#2b3231] leading-tight mb-6">Web<br/>Development</h3>
+            <h3 className="text-3xl font-bold text-[#2b3231] leading-tight mb-6">
+              {mostRequestedCategory.split(' ').map((word, i) => (
+                <React.Fragment key={i}>
+                  {word}<br/>
+                </React.Fragment>
+              ))}
+            </h3>
           </div>
           <p className="text-gray-600 text-sm leading-relaxed">
             Most common support area based on active community requests.
@@ -32,7 +97,7 @@ export function AICenterPage() {
         <Card className="bg-white border-none shadow-sm rounded-[24px] p-8 flex flex-col justify-between">
           <div>
             <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-4">URGENCY WATCH</p>
-            <h3 className="text-4xl font-bold text-[#2b3231] mb-6">1</h3>
+            <h3 className="text-4xl font-bold text-[#2b3231] mb-6">{highUrgencyCount}</h3>
           </div>
           <p className="text-gray-600 text-sm leading-relaxed">
             Requests currently flagged high priority by the urgency detector.
@@ -43,7 +108,7 @@ export function AICenterPage() {
         <Card className="bg-white border-none shadow-sm rounded-[24px] p-8 flex flex-col justify-between">
           <div>
             <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-4">MENTOR POOL</p>
-            <h3 className="text-4xl font-bold text-[#2b3231] mb-6">2</h3>
+            <h3 className="text-4xl font-bold text-[#2b3231] mb-6">{mentorCount}</h3>
           </div>
           <p className="text-gray-600 text-sm leading-relaxed">
             Trusted helpers with strong response history and contribution signals.
@@ -57,41 +122,33 @@ export function AICenterPage() {
         <h3 className="text-3xl font-bold text-[#2b3231] mb-8">Requests needing attention</h3>
 
         <div className="space-y-4">
-          {/* Recommendation 1 */}
-          <div className="bg-white border border-gray-100 rounded-[20px] p-6 lg:p-8">
-            <h4 className="font-bold text-[17px] leading-snug mb-3">Need help making my portfolio responsive before demo day</h4>
-            <p className="text-gray-600 text-[15px] leading-relaxed mb-6 max-w-4xl">
-              Responsive layout issue with a short deadline. Best helpers are frontend mentors comfortable with CSS grids and media queries.
-            </p>
-            <div className="flex flex-wrap gap-2">
-              <Badge variant="outline" className="border-gray-200 text-[#129780] bg-[#f0f9f8]">Web Development</Badge>
-              <Badge variant="outline" className="border-gray-200 text-[#129780] bg-[#f0f9f8]">High</Badge>
-            </div>
-          </div>
-
-          {/* Recommendation 2 */}
-          <div className="bg-white border border-gray-100 rounded-[20px] p-6 lg:p-8">
-            <h4 className="font-bold text-[17px] leading-snug mb-3">Looking for Figma feedback on a volunteer event poster</h4>
-            <p className="text-gray-600 text-[15px] leading-relaxed mb-6 max-w-4xl">
-              A visual design critique request where feedback on hierarchy, spacing, and messaging would create the most value.
-            </p>
-            <div className="flex flex-wrap gap-2">
-              <Badge variant="outline" className="border-gray-200 text-[#129780] bg-[#f0f9f8]">Design</Badge>
-              <Badge variant="outline" className="border-gray-200 text-[#129780] bg-[#f0f9f8]">Medium</Badge>
-            </div>
-          </div>
-
-          {/* Recommendation 3 */}
-          <div className="bg-white border border-gray-100 rounded-[20px] p-6 lg:p-8">
-            <h4 className="font-bold text-[17px] leading-snug mb-3">Need mock interview support for internship applications</h4>
-            <p className="text-gray-600 text-[15px] leading-relaxed mb-6 max-w-4xl">
-              Career coaching request focused on confidence-building, behavioral answers, and entry-level frontend interviews.
-            </p>
-            <div className="flex flex-wrap gap-2">
-              <Badge variant="outline" className="border-gray-200 text-[#129780] bg-[#f0f9f8]">Career</Badge>
-              <Badge variant="outline" className="border-gray-200 text-[#129780] bg-[#f0f9f8]">Low</Badge>
-            </div>
-          </div>
+          {loading ? (
+            <div className="text-center py-12 text-gray-500 font-medium">Analyzing community feed...</div>
+          ) : openPosts.length > 0 ? (
+            openPosts.map((post) => {
+              const aiSummary = `AI signals indicate this is a ${post.category || 'General'} request with ${post.urgency?.toLowerCase() || 'normal'} urgency. Best suited for members with ${post.tags?.[0]?.toLowerCase() || 'relevant'} expertise to resolve quickly.`;
+              return (
+                <div 
+                  key={post.id} 
+                  onClick={() => navigate(`/request/${post.id}`)}
+                  className="bg-white border border-gray-100 rounded-[20px] p-6 lg:p-8 cursor-pointer hover:border-[#129780]/30 transition-colors"
+                >
+                  <h4 className="font-bold text-[17px] leading-snug mb-3">{post.title}</h4>
+                  <p className="text-gray-600 text-[15px] leading-relaxed mb-6 max-w-4xl">
+                    {aiSummary}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="outline" className="border-gray-200 text-[#129780] bg-[#f0f9f8]">{post.category || 'General'}</Badge>
+                    <Badge variant="outline" className={`border-none ${post.urgency === 'High' ? 'bg-[#fef2f2] text-[#ef4444]' : 'border-gray-200 text-[#129780] bg-[#f0f9f8]'}`}>
+                      {post.urgency || 'Normal'}
+                    </Badge>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+             <div className="text-center py-12 text-gray-500 font-medium">No active requests needing attention right now.</div>
+          )}
         </div>
       </Card>
     </div>

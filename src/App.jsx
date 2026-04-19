@@ -11,7 +11,9 @@ import { DashboardPage } from './pages/DashboardPage';
 import { NotificationsPage } from './pages/NotificationsPage';
 import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
+import { RequestDetailPage } from './pages/RequestDetailPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { Toaster } from 'react-hot-toast';
 
 function PrivateRoute({ children }) {
   const { currentUser } = useAuth();
@@ -21,6 +23,7 @@ function PrivateRoute({ children }) {
 function App() {
   return (
     <AuthProvider>
+      <Toaster position="bottom-right" />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
@@ -44,6 +47,9 @@ function App() {
             } />
             <Route path="dashboard" element={
               <PrivateRoute><DashboardPage /></PrivateRoute>
+            } />
+            <Route path="request/:id" element={
+              <PrivateRoute><RequestDetailPage /></PrivateRoute>
             } />
             <Route path="notifications" element={
               <PrivateRoute><NotificationsPage /></PrivateRoute>

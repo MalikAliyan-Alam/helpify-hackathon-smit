@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { auth, db } from '../lib/firebase';
 import { 
@@ -5,9 +6,11 @@ import {
   signInWithEmailAndPassword, 
   signOut, 
   onAuthStateChanged,
-  updateProfile
+  updateProfile,
+  GoogleAuthProvider,
+  signInWithPopup
 } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, onSnapshot } from 'firebase/firestore';
 
 const AuthContext = createContext();
 
@@ -24,10 +27,22 @@ export function AuthProvider({ children }) {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
     
-    // Update auth profile
     await updateProfile(user, { displayName: name });
     
-    // We will skip Firestore for now as requested to avoid timeouts
+    const userRef = doc(db, 'users', user.uid);
+    await setDoc(userRef, {
+      uid: user.uid,
+      name,
+      email,
+      skills: [],
+      interests: [],
+      location: '',
+      trustScore: 100,
+      badges: ['New Member'],
+      contributions: 0,
+      createdAt: new Date()
+    });
+
     return user;
   }
 
@@ -35,34 +50,76 @@ export function AuthProvider({ children }) {
     return signInWithEmailAndPassword(auth, email, password);
   }
 
+  async function signInWithGoogle() {
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    
+    // Check if user exists in Firestore
+    const userRef = doc(db, 'users', user.uid);
+    const userSnap = await getDoc(userRef);
+    
+    if (!userSnap.exists()) {
+      await setDoc(userRef, {
+        uid: user.uid,
+        name: user.displayName || user.email.split('@')[0],
+        email: user.email,
+        skills: [],
+        interests: [],
+        location: '',
+        trustScore: 100,
+        badges: ['New Member'],
+        contributions: 0,
+        createdAt: new Date()
+      });
+    }
+    
+    return user;
+  }
+
   function logout() {
     return signOut(auth);
   }
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    let unsubscribeSnapshot = null;
+
+    const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
       
-      // Since we are skipping dynamic Firestore to fix the timeout,
-      // we just mock the userData if a user is logged in.
       if (user) {
+        // Fallback user data while loading from Firestore
         setUserData({
-          name: user.displayName || 'Ayesha Khan',
-          email: user.email,
-          location: 'Karachi',
-          trustScore: 98,
-          contributions: 3,
-          skills: ['Figma', 'UI/UX', 'HTML/CSS'],
-          badges: ['Design Ally', 'Fast Responder']
+          name: user.displayName || user.email,
+          email: user.email
+        });
+
+        // Listen in real-time to the user document
+        const userRef = doc(db, 'users', user.uid);
+        unsubscribeSnapshot = onSnapshot(userRef, (docSnap) => {
+          if (docSnap.exists()) {
+            setUserData(docSnap.data());
+          }
+          setLoading(false);
+        }, (error) => {
+          console.error("Firestore real-time read failed:", error);
+          setLoading(false);
         });
       } else {
         setUserData(null);
+        setLoading(false);
+        if (unsubscribeSnapshot) {
+          unsubscribeSnapshot();
+        }
       }
-      
-      setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribeAuth();
+      if (unsubscribeSnapshot) {
+        unsubscribeSnapshot();
+      }
+    };
   }, []);
 
   const value = {
@@ -70,6 +127,7 @@ export function AuthProvider({ children }) {
     userData,
     signup,
     login,
+    signInWithGoogle,
     logout
   };
 

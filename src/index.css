@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+@theme {
+  --font-sans: 'Outfit', sans-serif;
+  
+  --color-primary-bg: #f6f3eb;
+  --color-primary-text: #2b3231;
+  --color-accent: #129780;
+  --color-accent-hover: #0e7866;
+  --color-card-bg: #ffffff;
+  
+  --color-badge-green-bg: #e6f4ea;
+  --color-badge-green-text: #1e8e3e;
+  --color-badge-red-bg: #fce8e6;
+  --color-badge-red-text: #d93025;
+  --color-badge-gray-bg: #f1f3f4;
+  --color-badge-gray-text: #5f6368;
+}
+
+body {
+  background-color: var(--color-primary-bg);
+  color: var(--color-primary-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
+}
+
+/* Custom Utilities for pixel perfect match */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+}

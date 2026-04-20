@@ -1,4 +1,4 @@
-# 🤝 Helplytics AI — Community Support Platform
+# 🤝 Helplytics — Community Support Platform
 
 > **SMIT Grand Coding Night · April 2026**  
 > *"Writing code is not enough. Building a product is what truly matters."*
@@ -12,7 +12,6 @@
 - [Live Demo](#-live-demo)
 - [Screenshots](#-screenshots)
 - [Features](#-features)
-- [AI-Powered Features](#-ai-powered-features)
 - [Platform Pages](#-platform-pages)
 - [Tech Stack](#-tech-stack)
 - [Getting Started](#-getting-started)
@@ -25,7 +24,7 @@
 
 ## 🌐 Overview
 
-**Helplytics AI** is a multi-page, AI-powered community support platform built to bridge the gap between people who **need help** and those who **can provide it**. Whether it's a coding question, a learning roadblock, or a skill-based challenge — Helplytics makes collaboration fast, structured, and rewarding.
+**Helplytics** is a multi-page, community-driven support platform built to bridge the gap between people who **need help** and those who **can provide it**. Whether it's a coding question, a learning roadblock, or a skill-based challenge — Helplytics makes collaboration fast, structured, and rewarding.
 
 ---
 
@@ -39,23 +38,13 @@ In today's learning ecosystem, a critical gap exists:
 
 This results in slower learning, missed opportunities, and weak community collaboration.
 
-**Helplytics AI** solves this by providing a structured, intelligent, and community-driven platform for meaningful peer support.
+**Helplytics** solves this by providing a structured and community-driven platform for meaningful peer support.
 
 ---
 
 ## 🚀 Live Demo
 
-> 🔗 [helplytics.vercel.app](https://helplytics.vercel.app) *(update with your actual link)*
-
----
-
-## 📸 Screenshots
-
-> *(Add screenshots of your key pages here)*
-
-| Landing Page | Dashboard | Explore Feed |
-|---|---|---|
-| ![Landing](./screenshots/landing.png) | ![Dashboard](./screenshots/dashboard.png) | ![Feed](./screenshots/feed.png) |
+> 🔗 **[helpify-hackathon-smit.vercel.app](https://helpify-hackathon-smit.vercel.app/)**
 
 ---
 
@@ -77,112 +66,119 @@ This results in slower learning, missed opportunities, and weak community collab
 
 ---
 
-## 🤖 AI-Powered Features
-
-Helplytics integrates AI-like intelligence throughout the platform:
-
-| Feature | Description |
-|---|---|
-| 🏷️ **Auto Categorization** | Automatically classifies help requests by topic |
-| 💡 **Smart Tag Suggestions** | Suggests relevant tags based on request content |
-| 🚨 **Urgency Detection** | Detects and flags high-priority requests |
-| ✍️ **Rewrite Suggestions** | Helps users improve request clarity |
-| 🎯 **Skill Matching** | Suggests what skills a user can offer or needs |
-| 📊 **AI Insights** | Personalized dashboard insights and trends |
-| 🤝 **Response Suggestions** | Context-aware helper response prompts |
-
----
-
 ## 📄 Platform Pages
 
 | Page | Description |
 |---|---|
 | 🏠 **Landing Page** | Hero section, platform overview, stats & CTA |
 | 🔐 **Authentication** | Login / Signup with role selection |
-| 🧭 **Onboarding** | Name, skills, interests, location + AI suggestions |
-| 📊 **Dashboard** | Stats cards, recent requests, AI insights, quick actions |
+| 🧭 **Onboarding** | Name, skills, interests and location setup |
+| 📊 **Dashboard** | Stats cards, recent requests, and quick actions |
 | 🔍 **Explore / Feed** | All requests with filters (category, urgency, skills, location) |
-| ➕ **Create Request** | Request form with AI-powered categorization & tag suggestions |
-| 📋 **Request Detail** | Full description, AI summary, helper list, actions |
+| ➕ **Create Request** | Request form with tags, category, and urgency |
+| 📋 **Request Detail** | Full description, helper list, and actions |
 | 💬 **Messaging** | Basic communication between users |
 | 🏆 **Leaderboard** | Top helpers, rankings, and badges |
-| 🤖 **AI Center** | AI insights, suggestions, and community trends |
 | 🔔 **Notifications** | Real-time updates on requests and help status |
 | 👤 **Profile** | User info, skills, contributions, trust score & badges |
-| 🛠️ **Admin Panel** *(Bonus)* | Manage requests, moderate content, view analytics |
 
 ---
 
 ## 🛠️ Tech Stack
 
-```
-Frontend:    HTML · CSS · JavaScript
-Storage:     LocalStorage
-AI Logic:    Keyword-based JS classification engine
-Design:      Custom CSS inspired by Notion, Linear & Stripe
-```
-
-> *Stack used as per SMIT Batch 18 guidelines.*
+| Layer | Technology |
+|---|---|
+| ⚛️ Frontend Framework | React |
+| 🎨 Styling | Tailwind CSS |
+| 🔥 Backend & Database | Firebase (Auth + Firestore) |
+| ☁️ Deployment | Vercel |
 
 ---
 
 ## 🏁 Getting Started
 
 ### Prerequisites
-- A modern web browser (Chrome, Firefox, Edge)
-- No installations required — runs entirely in the browser
+- Node.js `v18+`
+- npm or yarn
+- A Firebase project with Auth and Firestore enabled
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/your-username/helplytics.git
+
+# Navigate into the project
+cd helplytics
+
+# Install dependencies
+npm install
+```
+
+### Environment Setup
+
+Create a `.env` file in the root directory and add your Firebase config:
+
+```env
+VITE_FIREBASE_API_KEY=your_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
+```
 
 ### Run Locally
 
 ```bash
-# Clone the repository
-git clone https://github.com/your-username/helplytics-ai.git
-
-# Navigate into the project
-cd helplytics-ai
-
-# Open in browser
-open index.html
+npm run dev
 ```
 
-Or simply open `index.html` directly in your browser.
+Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+### Build for Production
+
+```bash
+npm run build
+```
 
 ---
 
 ## 🗂️ Project Structure
 
 ```
-helplytics-ai/
+helplytics/
 │
-├── index.html              # Landing Page
-├── auth.html               # Login / Signup
-├── onboarding.html         # User Onboarding
-├── dashboard.html          # Main Dashboard
-├── explore.html            # Feed / Explore Requests
-├── create-request.html     # Create Help Request
-├── request-detail.html     # Request Detail View
-├── messages.html           # Messaging Page
-├── leaderboard.html        # Leaderboard
-├── ai-center.html          # AI Insights Center
-├── notifications.html      # Notifications
-├── profile.html            # User Profile
-├── admin.html              # Admin Panel (Bonus)
+├── public/
 │
-├── css/
-│   ├── global.css
-│   ├── dashboard.css
-│   └── ...
+├── src/
+│   ├── assets/
+│   ├── components/         # Reusable UI components
+│   ├── pages/              # Page-level components
+│   │   ├── Landing.jsx
+│   │   ├── Auth.jsx
+│   │   ├── Onboarding.jsx
+│   │   ├── Dashboard.jsx
+│   │   ├── Explore.jsx
+│   │   ├── CreateRequest.jsx
+│   │   ├── RequestDetail.jsx
+│   │   ├── Messages.jsx
+│   │   ├── Leaderboard.jsx
+│   │   ├── Notifications.jsx
+│   │   └── Profile.jsx
+│   ├── firebase/           # Firebase config & helpers
+│   ├── context/            # React context / state
+│   ├── hooks/              # Custom React hooks
+│   ├── App.jsx
+│   └── main.jsx
 │
-├── js/
-│   ├── auth.js
-│   ├── ai-engine.js        # AI categorization & tag logic
-│   ├── storage.js          # LocalStorage manager
-│   └── ...
-│
-└── assets/
-    ├── icons/
-    └── images/
+├── .env
+├── tailwind.config.js
+├── vite.config.js
+└── package.json
 ```
+
+> *(Adjust folder names to match your actual structure)*
 
 ---
 
@@ -190,7 +186,6 @@ helplytics-ai/
 
 - [x] 🏅 **Trust Score System** — Dynamic score based on helpful contributions
 - [x] 🏆 **Leaderboard** — Community rankings with badge rewards
-- [x] 🤖 **AI Suggestion Feature** — Smart skill & category suggestions
 - [x] 🔔 **Notification System** — Request updates and status change alerts
 
 ---
@@ -199,7 +194,7 @@ helplytics-ai/
 
 | Name | Role |
 |---|---|
-| *(Your Name)* | Full Stack Developer / Product Builder |
+| *Malik ALiyan* | Full Stack Developer / Product Builder |
 
 > Built with 💙 at **SMIT Grand Coding Night — April 2026**
 
@@ -213,7 +208,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 <div align="center">
 
-**Helplytics AI** — *Connecting learners. Empowering helpers. Building community.*
+**Helplytics** — *Connecting learners. Empowering helpers. Building community.*
 
 ⭐ Star this repo if you find it useful!
 

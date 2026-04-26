@@ -8,6 +8,7 @@ import { doc, onSnapshot, updateDoc, arrayUnion, addDoc, collection, serverTimes
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
 import { CommentSection } from '../components/CommentSection';
+import { BookingModal } from '../components/BookingModal';
 
 export function RequestDetailPage() {
   const { id } = useParams();
@@ -17,6 +18,8 @@ export function RequestDetailPage() {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [selectedHelper, setSelectedHelper] = useState(null);
   const [forceShowComments, setForceShowComments] = useState(false);
 
   useEffect(() => {
@@ -269,7 +272,20 @@ export function RequestDetailPage() {
                       <p className="font-bold text-[#2b3231] text-sm truncate">{helper.name}</p>
                       <p className="text-xs text-gray-500 truncate mt-0.5">{helper.skills}</p>
                     </div>
-                    <Badge variant="outline" className="bg-[#f0f9f8] text-[#129780] border-none shrink-0 text-xs">Trust {helper.trustScore}%</Badge>
+                    <div className="flex flex-col items-end gap-2 shrink-0">
+                      <Badge variant="outline" className="bg-[#f0f9f8] text-[#129780] border-none text-[10px]">Trust {helper.trustScore}%</Badge>
+                      {helper.uid !== currentUser?.uid && (
+                        <button 
+                          onClick={() => {
+                            setSelectedHelper(helper);
+                            setIsBookingOpen(true);
+                          }}
+                          className="text-[10px] font-bold text-[#129780] hover:underline"
+                        >
+                          Book Session
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))
               )}
@@ -277,6 +293,16 @@ export function RequestDetailPage() {
           </Card>
         </div>
       </div>
+
+      {selectedHelper && (
+        <BookingModal 
+          isOpen={isBookingOpen}
+          onClose={() => setIsBookingOpen(false)}
+          helper={selectedHelper}
+          post={post}
+          currentUser={currentUser}
+        />
+      )}
     </div>
   );
 }

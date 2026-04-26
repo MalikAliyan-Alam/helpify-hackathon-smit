@@ -13,6 +13,8 @@ import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
 import { RequestDetailPage } from './pages/RequestDetailPage';
 import { OnboardingPage } from './pages/OnboardingPage';
+import { SessionsPage } from './pages/SessionsPage';
+import { LiveSessionPage } from './pages/LiveSessionPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Toaster } from 'react-hot-toast';
 
@@ -74,6 +76,12 @@ function App() {
             } />
             <Route path="notifications" element={
               <PrivateRoute><NotificationsPage /></PrivateRoute>
+            } />
+            <Route path="sessions" element={
+              <PrivateRoute><SessionsPage /></PrivateRoute>
+            } />
+            <Route path="session/:sessionId" element={
+              <PrivateRoute><LiveSessionPage /></PrivateRoute>
             } />
             <Route path="onboarding" element={
               <PrivateRoute><OnboardingPage /></PrivateRoute>

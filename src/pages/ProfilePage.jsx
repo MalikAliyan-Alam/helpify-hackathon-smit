@@ -23,7 +23,13 @@ export function ProfilePage() {
   const [editLocation, setEditLocation] = useState(location !== 'Unknown Location' ? location : '');
   const [editSkills, setEditSkills] = useState(userData?.skills?.join(', ') || '');
   const [editInterests, setEditInterests] = useState(userData?.interests?.join(', ') || '');
+  const [availability, setAvailability] = useState(userData?.availability || {
+    days: [],
+    slots: ["10:00 - 12:00", "14:00 - 16:00"]
+  });
   const [loading, setLoading] = useState(false);
+
+  const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   // Sync state if userData updates via real-time listener
   React.useEffect(() => {
@@ -31,7 +37,17 @@ export function ProfilePage() {
     setEditLocation(location !== 'Unknown Location' ? location : '');
     setEditSkills(userData?.skills?.join(', ') || '');
     setEditInterests(userData?.interests?.join(', ') || '');
+    if (userData?.availability) setAvailability(userData.availability);
   }, [userData, name, location]);
+
+  const toggleDay = (day) => {
+    setAvailability(prev => ({
+      ...prev,
+      days: prev.days.includes(day) 
+        ? prev.days.filter(d => d !== day)
+        : [...prev.days, day]
+    }));
+  };
 
   async function handleUpdateProfile(e) {
     e.preventDefault();
@@ -45,13 +61,14 @@ export function ProfilePage() {
         await updateProfile(auth.currentUser, { displayName: editName });
       }
 
-      // Update Firestore Profile using setDoc with merge to ensure it works even if doc missing
+      // Update Firestore Profile using setDoc with merge
       const userRef = doc(db, 'users', currentUser.uid);
       await setDoc(userRef, {
         name: editName,
         location: editLocation,
         skills: editSkills.split(',').map(s => s.trim()).filter(s => s),
-        interests: editInterests.split(',').map(i => i.trim()).filter(i => i)
+        interests: editInterests.split(',').map(i => i.trim()).filter(i => i),
+        availability: availability
       }, { merge: true });
       
       toast.success('Profile updated successfully!');
@@ -77,53 +94,110 @@ export function ProfilePage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 items-start">
-        {/* Skills & Reputation */}
-        <Card className="bg-[#fdfcf9] border-none shadow-sm rounded-[24px] p-8">
-          <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-2">PUBLIC PROFILE</p>
-          <h3 className="text-3xl font-bold text-[#2b3231] mb-8">Skills and reputation</h3>
+        <div className="space-y-8">
+          {/* Skills & Reputation */}
+          <Card className="bg-[#fdfcf9] border-none shadow-sm rounded-[24px] p-8">
+            <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-2">PUBLIC PROFILE</p>
+            <h3 className="text-3xl font-bold text-[#2b3231] mb-8">Skills and reputation</h3>
 
-          <div className="space-y-6">
-            <div className="flex items-center justify-between border-b border-gray-200/60 pb-4">
-              <span className="text-sm font-medium text-gray-700">Trust score</span>
-              <span className="text-sm font-bold text-[#2b3231]">{trustScore}%</span>
-            </div>
-            
-            <div className="flex items-center justify-between border-b border-gray-200/60 pb-4">
-              <span className="text-sm font-medium text-gray-700">Contributions</span>
-              <span className="text-sm font-bold text-[#2b3231]">{contributions}</span>
-            </div>
+            <div className="space-y-6">
+              <div className="flex items-center justify-between border-b border-gray-200/60 pb-4">
+                <span className="text-sm font-medium text-gray-700">Trust score</span>
+                <span className="text-sm font-bold text-[#2b3231]">{trustScore}%</span>
+              </div>
+              
+              <div className="flex items-center justify-between border-b border-gray-200/60 pb-4">
+                <span className="text-sm font-medium text-gray-700">Contributions</span>
+                <span className="text-sm font-bold text-[#2b3231]">{contributions}</span>
+              </div>
 
-            <div>
-              <p className="text-sm font-bold text-[#2b3231] mb-3">Skills</p>
-              <div className="flex flex-wrap gap-2">
-                {skills.map((skill, index) => (
-                  <Badge key={`skill-${index}`} variant="outline" className="border-gray-200 text-[#129780] bg-[#f0f9f8] px-4 py-1.5 font-semibold">{skill}</Badge>
-                ))}
+              <div>
+                <p className="text-sm font-bold text-[#2b3231] mb-3">Skills</p>
+                <div className="flex flex-wrap gap-2">
+                  {skills.map((skill, index) => (
+                    <Badge key={`skill-${index}`} variant="outline" className="border-gray-200 text-[#129780] bg-[#f0f9f8] px-4 py-1.5 font-semibold">{skill}</Badge>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-sm font-bold text-[#2b3231] mb-3">Interests</p>
+                <div className="flex flex-wrap gap-2">
+                  {interests.map((interest, index) => (
+                    <Badge key={`interest-${index}`} variant="outline" className="border-gray-200 text-purple-600 bg-purple-50 px-4 py-1.5 font-semibold">{interest}</Badge>
+                  ))}
+                </div>
               </div>
             </div>
+          </Card>
 
-            <div>
-              <p className="text-sm font-bold text-[#2b3231] mb-3">Interests</p>
-              <div className="flex flex-wrap gap-2">
-                {interests.map((interest, index) => (
-                  <Badge key={`interest-${index}`} variant="outline" className="border-gray-200 text-purple-600 bg-purple-50 px-4 py-1.5 font-semibold">{interest}</Badge>
-                ))}
+          {/* Availability Setup */}
+          <Card className="bg-[#fdfcf9] border-none shadow-sm rounded-[24px] p-8">
+            <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-2">SCHEDULING</p>
+            <h3 className="text-3xl font-bold text-[#2b3231] mb-4">Availability Setup</h3>
+            <p className="text-sm text-gray-500 mb-8">Select the days and times you are usually available to help others.</p>
+
+            <div className="space-y-8">
+              <div>
+                <label className="block text-sm font-bold text-[#2b3231] mb-4">Available Days</label>
+                <div className="flex flex-wrap gap-3">
+                  {daysOfWeek.map(day => (
+                    <button
+                      key={day}
+                      onClick={() => toggleDay(day)}
+                      type="button"
+                      className={`px-4 py-2 rounded-full text-sm font-bold transition-all border ${
+                        availability.days.includes(day)
+                          ? 'bg-[#129780] text-white border-[#129780]'
+                          : 'bg-white text-gray-400 border-gray-200 hover:border-[#129780] hover:text-[#129780]'
+                      }`}
+                    >
+                      {day}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-[#2b3231] mb-4">Time Slots</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {availability.slots.map((slot, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                       <input 
+                        type="text" 
+                        value={slot}
+                        onChange={(e) => {
+                          const newSlots = [...availability.slots];
+                          newSlots[idx] = e.target.value;
+                          setAvailability(prev => ({ ...prev, slots: newSlots }));
+                        }}
+                        className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#129780]"
+                      />
+                      <button 
+                        onClick={() => {
+                          const newSlots = availability.slots.filter((_, i) => i !== idx);
+                          setAvailability(prev => ({ ...prev, slots: newSlots }));
+                        }}
+                        className="p-2 text-red-400 hover:text-red-600"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                  <button 
+                    onClick={() => setAvailability(prev => ({ ...prev, slots: [...prev.slots, "09:00 - 11:00"] }))}
+                    className="text-xs font-bold text-[#129780] border border-dashed border-[#129780]/30 rounded-xl py-2 hover:bg-[#f0f9f8] transition-colors"
+                  >
+                    + Add Slot
+                  </button>
+                </div>
               </div>
             </div>
-
-            <div>
-              <p className="text-sm font-bold text-[#2b3231] mb-3">Badges</p>
-              <div className="flex flex-wrap gap-2">
-                {badges.map((badge, index) => (
-                  <Badge key={`badge-${index}`} variant="outline" className="border-[#129780]/20 text-[#129780] bg-[#129780]/10 px-4 py-1.5 font-semibold">{badge}</Badge>
-                ))}
-              </div>
-            </div>
-          </div>
-        </Card>
+          </Card>
+        </div>
 
         {/* Edit Profile Form */}
-        <Card className="bg-white border-none shadow-sm rounded-[24px] p-8">
+        <Card className="bg-white border-none shadow-sm rounded-[24px] p-8 sticky top-8">
           <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-2">EDIT PROFILE</p>
           <h3 className="text-3xl font-bold text-[#2b3231] mb-8">Update your identity</h3>
 

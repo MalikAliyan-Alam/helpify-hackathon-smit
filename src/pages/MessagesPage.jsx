@@ -4,7 +4,10 @@ import { Button } from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../lib/firebase';
 import { collection, query, where, onSnapshot, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
+import { storage } from '../lib/firebase';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import toast from 'react-hot-toast';
+import { VoiceNoteRecorder } from '../components/VoiceNoteRecorder';
 
 export function MessagesPage() {
   const { currentUser, userData } = useAuth();
@@ -97,6 +100,27 @@ export function MessagesPage() {
     }
   };
 
+  const handleVoiceSend = async (audioURL) => {
+    if (!selectedUser || !currentUser) return;
+    try {
+      const receiver = users.find(u => u.id === selectedUser);
+      const messageData = {
+        participants: [currentUser.uid, selectedUser],
+        senderId: currentUser.uid,
+        senderName: userData?.name || currentUser.displayName || currentUser.email || 'Anonymous',
+        receiverId: selectedUser,
+        receiverName: receiver?.name || 'User',
+        content: '',
+        audioURL: audioURL,
+        createdAt: serverTimestamp()
+      };
+      await addDoc(collection(db, 'messages'), messageData);
+    } catch (error) {
+      console.error('Error sending voice message:', error);
+      toast.error('Failed to send voice note.');
+    }
+  };
+
   const formatTime = (timestamp) => {
     if (!timestamp) return '';
     const date = timestamp.toDate();
@@ -133,7 +157,13 @@ export function MessagesPage() {
                       {msg.senderName} → {msg.receiverName}
                     </p>
                     <p className="text-gray-600 text-sm leading-relaxed break-words">
-                      {msg.content}
+                      {msg.audioURL ? (
+                        <div className="mt-2">
+                          <audio src={msg.audioURL} controls className="h-8 w-full max-w-[200px]" />
+                        </div>
+                      ) : (
+                        msg.content
+                      )}
                     </p>
                   </div>
                   <div className="w-16 h-12 rounded-[12px] bg-[#e8f3f1] flex items-center justify-center flex-shrink-0 text-[#129780] text-xs font-bold text-center leading-tight shadow-sm border border-[#d1e8e4]">
@@ -175,9 +205,15 @@ export function MessagesPage() {
               ></textarea>
             </div>
 
-            <Button type="submit" disabled={sending} className="w-full rounded-full font-semibold py-3 text-base">
-              {sending ? 'Sending...' : 'Send'}
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button type="submit" disabled={sending} className="flex-1 rounded-full font-semibold py-3 text-base">
+                {sending ? 'Sending...' : 'Send'}
+              </Button>
+              <VoiceNoteRecorder 
+                onSend={handleVoiceSend} 
+                storageFolder={`voiceNotes/messages/${currentUser.uid}`} 
+              />
+            </div>
           </form>
         </Card>
       </div>

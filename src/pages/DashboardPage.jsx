@@ -4,8 +4,9 @@ import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../lib/firebase';
-import { collection, query, orderBy, limit, onSnapshot, where } from 'firebase/firestore';
+import { collection, query, orderBy, limit, onSnapshot, where, doc, updateDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 export function DashboardPage() {
   const { currentUser, userData } = useAuth();
@@ -15,6 +16,40 @@ export function DashboardPage() {
   const [posts, setPosts] = useState([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [notifications, setNotifications] = useState([]);
+  const [bookings, setBookings] = useState([]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+
+    // Fetch bookings where user is helper OR requester
+    // Firestore doesn't support logical OR across different fields in a simple query, 
+    // so we'll fetch both and merge or use two listeners.
+    const qHelper = query(collection(db, 'bookings'), where('helperId', '==', currentUser.uid), where('status', '==', 'pending'));
+    const qRequester = query(collection(db, 'bookings'), where('requesterId', '==', currentUser.uid), where('status', '==', 'pending'));
+
+    const unsubHelper = onSnapshot(qHelper, (snap) => {
+      const helperBookings = snap.docs.map(doc => ({ id: doc.id, ...doc.data(), role: 'helper' }));
+      updateBookings(helperBookings, 'helper');
+    });
+
+    const unsubRequester = onSnapshot(qRequester, (snap) => {
+      const requesterBookings = snap.docs.map(doc => ({ id: doc.id, ...doc.data(), role: 'requester' }));
+      updateBookings(requesterBookings, 'requester');
+    });
+
+    const updateBookings = (newBookings, type) => {
+      setBookings(prev => {
+        const others = prev.filter(b => b.role !== type);
+        const combined = [...others, ...newBookings];
+        return combined.sort((a, b) => new Date(a.date) - new Date(b.date));
+      });
+    };
+
+    return () => {
+      unsubHelper();
+      unsubRequester();
+    };
+  }, [currentUser]);
 
   useEffect(() => {
     const q = query(
@@ -102,6 +137,24 @@ export function DashboardPage() {
         </p>
       </div>
 
+      {/* Setup Availability CTA */}
+      {(!userData?.availability?.slots || userData?.availability?.slots.length === 0) && (
+        <Card className="bg-[#129780] border-none shadow-lg rounded-[24px] p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 animate-in zoom-in duration-500">
+          <div className="flex-1">
+            <h3 className="text-2xl font-bold mb-2">Enable Session Bookings 📅</h3>
+            <p className="text-white/80 text-sm leading-relaxed">
+              You haven't set up your availability yet. Define your preferred days and time slots in your profile so other members can book support sessions with you.
+            </p>
+          </div>
+          <Button 
+            onClick={() => navigate('/profile')}
+            className="bg-white text-[#129780] hover:bg-gray-100 font-bold px-8 py-3 rounded-full shrink-0"
+          >
+            Setup Availability
+          </Button>
+        </Card>
+      )}
+
       {/* Stats Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="bg-[#fdfcf9] border-none shadow-sm rounded-[24px] p-6 lg:p-8 flex flex-col justify-between">
@@ -144,6 +197,75 @@ export function DashboardPage() {
           </p>
         </Card>
       </div>
+
+      {/* Upcoming Sessions Section */}
+      {bookings.length > 0 && (
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-2">LIVE MOMENTUM</p>
+              <h3 className="text-2xl font-bold text-[#2b3231]">Upcoming Sessions</h3>
+            </div>
+            <button 
+              onClick={() => navigate('/sessions')}
+              className="text-xs font-bold text-[#129780] hover:underline"
+            >
+              View all sessions →
+            </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {bookings.map(booking => (
+              <Card key={booking.id} className="bg-white border-none shadow-md rounded-[24px] p-6 flex flex-col relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-[#129780]/5 rounded-bl-full -mr-8 -mt-8 transition-all group-hover:scale-110"></div>
+                <div className="flex items-center gap-4 mb-4">
+                   <div className="bg-[#129780] text-white p-3 rounded-2xl">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15.6 11.6L22 7v10l-6.4-4.6z"></path><rect x="2" y="5" width="14" height="14" rx="2"></rect></svg>
+                   </div>
+                   <div>
+                     <p className="text-sm font-bold text-[#2b3231]">{booking.date}</p>
+                     <p className="text-xs text-[#129780] font-bold uppercase tracking-wider">{booking.slot}</p>
+                   </div>
+                </div>
+                <h4 className="font-bold text-gray-800 text-lg mb-2 truncate">{booking.postTitle}</h4>
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-bold">
+                    {(booking.role === 'helper' ? booking.requesterName : booking.helperName).charAt(0)}
+                  </div>
+                  <p className="text-sm text-gray-500">
+                    {booking.role === 'helper' ? 'Helping' : 'Mentored by'} <span className="font-bold text-gray-700">{booking.role === 'helper' ? booking.requesterName : booking.helperName}</span>
+                  </p>
+                </div>
+                <div className="flex flex-col gap-3 mt-auto">
+                  <Button 
+                    onClick={() => navigate(`/session/${booking.id}`)}
+                    className="w-full rounded-full py-2.5 font-bold bg-[#129780] shadow-sm"
+                  >
+                    Join Call
+                  </Button>
+                  <div className="flex items-center justify-between">
+                    <Badge variant="outline" className="bg-[#f0f9f8] text-[#129780] border-none text-[10px] py-1 px-3">Pending</Badge>
+                    <button 
+                      onClick={async () => {
+                        if(window.confirm('Cancel this session?')) {
+                          try {
+                            await updateDoc(doc(db, 'bookings', booking.id), { status: 'cancelled' });
+                            toast.success('Session cancelled');
+                          } catch (err) {
+                            toast.error('Failed to cancel session');
+                          }
+                        }
+                      }}
+                      className="text-[10px] font-bold text-red-400 hover:text-red-600 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 items-start">
         {/* Main Feed */}

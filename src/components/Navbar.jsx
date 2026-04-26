@@ -38,6 +38,7 @@ export function Navbar() {
     { name: 'Explore', path: '/explore' },
     { name: 'Create Request', path: '/create' },
     { name: 'Messages', path: '/messages' },
+    { name: 'Sessions', path: '/sessions' },
     { name: 'Profile', path: '/profile' }
   ] : [
     { name: 'Explore', path: '/explore' },

@@ -19,6 +19,7 @@ import { Button } from './ui/Button';
 import { Card } from './ui/Card';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
+import { VoiceNoteRecorder } from './VoiceNoteRecorder';
 
 export function CommentSection({ postId, postTitle, authorId, authorName, helpers = [] }) {
   const { currentUser, userData } = useAuth();
@@ -238,6 +239,7 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
         userName,
         content: commentText,
         attachment,
+        audioURL: null,
         createdAt: serverTimestamp(),
         likes: []
       });
@@ -291,6 +293,41 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
     }
   };
 
+  const handleVoiceSend = async (audioURL) => {
+    if (!currentUser) return;
+    try {
+      const userName = userData?.name || currentUser.displayName || 'Anonymous';
+      await addDoc(collection(db, 'comments'), {
+        postId,
+        userId: currentUser.uid,
+        userName,
+        content: '',
+        attachment: null,
+        audioURL: audioURL,
+        createdAt: serverTimestamp(),
+        likes: []
+      });
+      
+      // Notify author
+      if (authorId && authorId !== currentUser.uid) {
+        try {
+          await addDoc(collection(db, 'notifications'), {
+            userId: authorId,
+            message: `${userName} sent a voice note on "${postTitle}"`,
+            type: 'Comment',
+            createdAt: serverTimestamp(),
+            read: false
+          });
+        } catch (notifErr) {
+          console.warn("Notification failed to send to author:", notifErr);
+        }
+      }
+    } catch (err) {
+      console.error('Error sending voice comment:', err);
+      toast.error('Failed to send voice note');
+    }
+  };
+
   const handleReaction = async (commentId, currentLikes = []) => {
     if (!currentUser) return;
     const commentRef = doc(db, 'comments', commentId);
@@ -304,7 +341,15 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
     }
   };
 
-  const renderContent = (content) => {
+  const renderContent = (content, audioURL) => {
+    if (audioURL) {
+      return (
+        <div className="flex flex-col gap-2">
+          <audio src={audioURL} controls className="max-w-full h-8 brightness-110 contrast-125" />
+          {content && <p>{content}</p>}
+        </div>
+      );
+    }
     if (!content) return null;
     const parts = content.split(/(@\w+(?:\s\w+)?)/g);
     return parts.map((part, i) => {
@@ -379,7 +424,7 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
                           )}
                         </div>
                       )}
-                      {renderContent(comment.content)}
+                      {renderContent(comment.content, comment.audioURL)}
                     </div>
                     
                     <button 
@@ -519,6 +564,10 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
              >
                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
              </button>
+             <VoiceNoteRecorder 
+               onSend={handleVoiceSend} 
+               storageFolder={`voiceNotes/comments/${postId}`} 
+             />
           </div>
         </form>
       </div>

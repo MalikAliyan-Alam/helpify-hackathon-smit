@@ -1,14 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from './ui/Button';
 import { useAuth } from '../contexts/AuthContext';
+import { db } from '../lib/firebase';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 
 export function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
+  const [unreadCount, setUnreadCount] = useState(0);
   
+  useEffect(() => {
+    if (!currentUser) {
+      setUnreadCount(0);
+      return;
+    }
+
+    const q = query(
+      collection(db, 'notifications'),
+      where('userId', '==', currentUser.uid),
+      where('read', '==', false)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setUnreadCount(snapshot.size);
+    });
+
+    return () => unsubscribe();
+  }, [currentUser]);
+
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
 
   const displayedLinks = currentUser ? [
@@ -94,8 +116,13 @@ export function Navbar() {
       <div className="flex justify-end items-center gap-4">
         {currentUser ? (
           <>
-            <Link to="/notifications" className="hidden xl:flex items-center px-5 py-2.5 bg-white rounded-full border border-gray-200 text-[15px] font-medium text-gray-500 shadow-sm hover:bg-gray-50 transition-colors whitespace-nowrap">
+            <Link to="/notifications" className="hidden xl:flex items-center gap-2 px-5 py-2.5 bg-white rounded-full border border-gray-200 text-[15px] font-medium text-gray-500 shadow-sm hover:bg-gray-50 transition-colors whitespace-nowrap">
               Notifications
+              {unreadCount > 0 && (
+                <span className="flex items-center justify-center bg-red-500 text-white text-[10px] font-bold min-w-[18px] h-[18px] px-1 rounded-full">
+                  {unreadCount}
+                </span>
+              )}
             </Link>
             <Link to="/ai-center">
               <Button variant="default" className="rounded-full px-6 py-2.5 text-[15px] font-semibold whitespace-nowrap">Open AI Center</Button>

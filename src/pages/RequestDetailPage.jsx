@@ -7,6 +7,7 @@ import { db } from '../lib/firebase';
 import { doc, onSnapshot, updateDoc, arrayUnion, addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
+import { CommentSection } from '../components/CommentSection';
 
 export function RequestDetailPage() {
   const { id } = useParams();
@@ -16,6 +17,7 @@ export function RequestDetailPage() {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [forceShowComments, setForceShowComments] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -116,6 +118,7 @@ export function RequestDetailPage() {
       }
 
       toast.success("You are now listed as a helper!");
+      setForceShowComments(true);
     } catch (err) {
       console.error(err);
       toast.error("Failed to offer help.");
@@ -137,6 +140,8 @@ export function RequestDetailPage() {
   // Mock data for AI summary based on UI
   const aiSummary = `AI summary: ${post.category || 'General'} request with ${post.urgency?.toLowerCase() || 'normal'} urgency. Best suited for members with ${post.tags?.[0]?.toLowerCase() || 'relevant'} expertise.`;
   const authorInitials = post.authorName ? post.authorName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'U';
+  const isHelper = helpers.some(h => h.uid === currentUser?.uid);
+  const showCommentSection = isAuthor || isHelper || forceShowComments;
 
   return (
     <div className="flex flex-col gap-8 pb-12">
@@ -177,11 +182,21 @@ export function RequestDetailPage() {
             )}
           </Card>
 
+          {showCommentSection && (
+            <CommentSection 
+              postId={post.id} 
+              postTitle={post.title} 
+              authorId={post.userId} 
+              authorName={post.authorName}
+              helpers={post.helpers || []}
+            />
+          )}
+
           {/* Actions */}
           <Card className="bg-[#fdfcf9] border-none shadow-sm rounded-[24px] p-8">
             <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-2">ACTIONS</p>
             <div className="flex flex-wrap items-center gap-4 mt-4">
-              {!isAuthor && !isSolved && (
+              {!isAuthor && !isSolved && !isHelper && (
                 <Button 
                   onClick={handleOfferHelp}
                   disabled={actionLoading}

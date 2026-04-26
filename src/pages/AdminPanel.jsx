@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { db } from '../lib/firebase';
-import { collection, query, where, onSnapshot, doc, updateDoc, addDoc, serverTimestamp, increment } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, updateDoc, addDoc, serverTimestamp, increment, getDocs } from 'firebase/firestore';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';
+import { DailyChallengeService } from '../lib/DailyChallengeService';
 import toast from 'react-hot-toast';
 
 export function AdminPanel() {
   const { currentUser, userData } = useAuth();
-  const [activeTab, setActiveTab] = useState('verifications'); // 'verifications', 'reports', 'users'
+  const [activeTab, setActiveTab] = useState('verifications'); // 'verifications', 'reports', 'users', 'dev'
   const [applications, setApplications] = useState([]);
   const [reports, setReports] = useState([]);
   const [users, setUsers] = useState([]);
@@ -148,6 +149,101 @@ export function AdminPanel() {
     }
   };
 
+  const handleSeedPolls = async () => {
+    try {
+      const polls = [
+        {
+          question: "Which feature should we prioritize next?",
+          options: ["Mobile App", "AI Mentorship", "Voice Calls", "Global Search"],
+          votes: { 0: [], 1: [], 2: [], 3: [] },
+          status: 'open',
+          creatorId: currentUser.uid,
+          creatorName: 'System Admin',
+          createdAt: serverTimestamp()
+        },
+        {
+          question: "How often should we hold community workshops?",
+          options: ["Weekly", "Bi-Weekly", "Monthly", "Quarterly"],
+          votes: { 0: [], 1: [], 2: [], 3: [] },
+          status: 'open',
+          creatorId: currentUser.uid,
+          creatorName: 'System Admin',
+          createdAt: serverTimestamp()
+        }
+      ];
+
+      for (const p of polls) {
+        await addDoc(collection(db, 'polls'), p);
+      }
+      toast.success('Sample polls created! 📊');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to seed polls');
+    }
+  };
+
+  const handleSeedRequests = async () => {
+    try {
+      const sampleRequests = [
+        {
+          title: "Fixing responsive layout on mobile dashboard",
+          description: "Our mobile view is slightly broken on iPhone 13. Need someone to help with CSS media queries.",
+          category: "Development",
+          urgency: "High",
+          status: "open",
+          userId: currentUser.uid,
+          authorName: userData?.name || 'System Admin',
+          createdAt: serverTimestamp(),
+          tags: ["React", "CSS", "Mobile"]
+        },
+        {
+          title: "Design a new logo for the community hub",
+          description: "We need a modern, minimalist logo that reflects our values of help and collaboration.",
+          category: "Design",
+          urgency: "Normal",
+          status: "open",
+          userId: currentUser.uid,
+          authorName: userData?.name || 'System Admin',
+          createdAt: serverTimestamp(),
+          tags: ["UI/UX", "Branding"]
+        },
+        {
+          title: "Help with writing a professional email template",
+          description: "I need a polite way to follow up on a project proposal. Any copywriters here?",
+          category: "General",
+          urgency: "Low",
+          status: "open",
+          userId: currentUser.uid,
+          authorName: userData?.name || 'System Admin',
+          createdAt: serverTimestamp(),
+          tags: ["Writing", "Business"]
+        }
+      ];
+
+      for (const req of sampleRequests) {
+        await addDoc(collection(db, 'posts'), req);
+      }
+      toast.success('Sample requests created! 🚀');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to seed requests');
+    }
+  };
+
+  const handleTriggerChallenge = async () => {
+    try {
+      const challenge = await DailyChallengeService.triggerDailySelection();
+      if (challenge) {
+        toast.success(`Challenge Triggered: ${challenge.title} 🏆`);
+      } else {
+        toast.error('No suitable open requests found to trigger a challenge.');
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to trigger challenge');
+    }
+  };
+
   if (!isAdmin) {
     return (
       <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
@@ -183,6 +279,12 @@ export function AdminPanel() {
               className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'users' ? 'bg-[#2b3231] text-white border border-white/10' : 'text-gray-400 hover:text-white'}`}
             >
               Manage Users ({users.length})
+            </button>
+            <button 
+              onClick={() => setActiveTab('dev')}
+              className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'dev' ? 'bg-indigo-500 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+            >
+              Developer Tools 🛠️
             </button>
           </div>
         </div>
@@ -297,6 +399,66 @@ export function AdminPanel() {
               </Card>
             ))
           )
+        ) : activeTab === 'dev' ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-4">
+             <Card className="bg-white border-none shadow-xl rounded-[32px] p-8 flex flex-col items-center text-center">
+                <div className="w-16 h-16 bg-yellow-100 text-yellow-600 rounded-3xl flex items-center justify-center text-2xl mb-6 shadow-inner">🏆</div>
+                <h3 className="text-xl font-bold text-[#2b3231] mb-2">Trigger Daily Challenge</h3>
+                <p className="text-sm text-gray-500 mb-8 max-w-xs">
+                  Runs the selection algorithm to pick today's high-urgency request and launches it to the dashboard.
+                </p>
+                <Button onClick={handleTriggerChallenge} className="w-full bg-yellow-400 hover:bg-yellow-500 text-[#2b3231] font-black rounded-2xl py-4 shadow-lg shadow-yellow-400/20">
+                  TRIGGER SELECTION NOW
+                </Button>
+             </Card>
+
+             <Card className="bg-white border-none shadow-xl rounded-[32px] p-8 flex flex-col items-center text-center">
+                <div className="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-3xl flex items-center justify-center text-2xl mb-6 shadow-inner">📊</div>
+                <h3 className="text-xl font-bold text-[#2b3231] mb-2">Seed Sample Polls</h3>
+                <p className="text-sm text-gray-500 mb-8 max-w-xs">
+                  Populates the community polls collection with example discussions for testing.
+                </p>
+                <Button onClick={handleSeedPolls} className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-black rounded-2xl py-4 shadow-lg shadow-indigo-500/20">
+                  GENERATE SAMPLE POLLS
+                </Button>
+             </Card>
+
+             <Card className="bg-white border-none shadow-xl rounded-[32px] p-8 flex flex-col items-center text-center">
+                <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-3xl flex items-center justify-center text-2xl mb-6 shadow-inner">🚀</div>
+                <h3 className="text-xl font-bold text-[#2b3231] mb-2">Seed Sample Requests</h3>
+                <p className="text-sm text-gray-500 mb-8 max-w-xs">
+                  Creates example help requests in the system so the challenge algorithm has content to pick from.
+                </p>
+                <Button onClick={handleSeedRequests} className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-2xl py-4 shadow-lg shadow-emerald-500/20">
+                  GENERATE REQUESTS
+                </Button>
+             </Card>
+
+             <Card className="bg-[#2b3231] border-none shadow-xl rounded-[32px] p-8 md:col-span-2 text-white overflow-hidden relative">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+                <div className="flex items-center gap-4 mb-4">
+                   <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">🛠️</div>
+                   <h3 className="text-lg font-bold">Quick Diagnostics</h3>
+                </div>
+                <p className="text-sm text-white/40 mb-6">
+                  Real-time snapshot of the platform's core engagement metrics.
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                   <div className="bg-white/5 p-4 rounded-2xl border border-white/10">
+                      <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Users</p>
+                      <p className="text-xl font-bold">{users.length}</p>
+                   </div>
+                   <div className="bg-white/5 p-4 rounded-2xl border border-white/10">
+                      <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Reports</p>
+                      <p className="text-xl font-bold">{reports.length}</p>
+                   </div>
+                   <div className="bg-white/5 p-4 rounded-2xl border border-white/10">
+                      <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Apps</p>
+                      <p className="text-xl font-bold">{applications.length}</p>
+                   </div>
+                </div>
+             </Card>
+          </div>
         ) : (
           <div className="space-y-6">
             <div className="flex items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">

@@ -5,10 +5,10 @@ export function Button({ className, variant = 'default', size = 'default', child
   const baseStyles = 'inline-flex items-center justify-center rounded-full font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
   
   const variants = {
-    default: 'bg-[#129780] text-white hover:bg-[#0e7866]',
-    outline: 'border border-gray-300 bg-transparent hover:bg-gray-100 text-gray-900',
-    ghost: 'hover:bg-gray-100 text-gray-900',
-    secondary: 'bg-white text-gray-900 shadow-sm border border-gray-200 hover:bg-gray-50',
+    default: 'bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)]',
+    outline: 'border border-[var(--border-color)] bg-transparent hover:bg-[var(--bg-secondary)] text-[var(--text-primary)]',
+    ghost: 'hover:bg-[var(--bg-secondary)] text-[var(--text-primary)]',
+    secondary: 'bg-[var(--bg-card)] text-[var(--text-primary)] shadow-sm border border-[var(--border-color)] hover:bg-[var(--bg-secondary)]',
     dark: 'bg-[#2b3231] text-white hover:bg-[#1f2524]',
   };
 

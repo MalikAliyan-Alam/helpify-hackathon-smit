@@ -1,7 +1,8 @@
 import React from 'react';
 import { db } from './firebase';
-import { doc, updateDoc, increment, serverTimestamp } from 'firebase/firestore';
+import { doc, updateDoc, increment, serverTimestamp, getDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
+import confetti from 'canvas-confetti'; // Celebratory achievement animation
 
 export const BADGE_DEFINITIONS = {
   FIRST_HELPER: { id: 'FIRST_HELPER', name: 'First Helper', icon: '🌱', description: 'Help on your first request', condition: 'first_help' },
@@ -12,7 +13,10 @@ export const BADGE_DEFINITIONS = {
   COMMUNITY_PILLAR: { id: 'COMMUNITY_PILLAR', name: 'Community Pillar', icon: '🤝', description: 'Help on 50 requests total', condition: '50_helps' },
   EXPERT_VOICE: { id: 'EXPERT_VOICE', name: 'Expert Voice', icon: '🧠', description: 'Get verified in a skill category', condition: 'verified' },
   EARLY_ADOPTER: { id: 'EARLY_ADOPTER', name: 'Early Adopter', icon: '🚀', description: 'One of the first 100 users', condition: 'early_join' },
-  LEGEND: { id: 'LEGEND', name: 'Legend', icon: '👑', description: 'Maintain a 100-day helping streak', condition: '100_day_streak' }
+  LEGEND: { id: 'LEGEND', name: 'Legend', icon: '👑', description: 'Maintain a 100-day helping streak', condition: '100_day_streak' },
+  COMMUNITY_FAVORITE: { id: 'COMMUNITY_FAVORITE', name: 'Community Favorite', icon: '👏', description: 'Received 50 Kudos from the community', condition: '50_kudos' },
+  CROWD_PLEASER: { id: 'CROWD_PLEASER', name: 'Crowd Pleaser', icon: '🌟', description: 'Received 100 Kudos from the community', condition: '100_kudos' },
+  LEGEND_OF_KINDNESS: { id: 'LEGEND_OF_KINDNESS', name: 'Legend of Kindness', icon: '🏵️', description: 'Received 500 Kudos from the community', condition: '500_kudos' }
 };
 
 export const checkAndUnlockBadges = async (userId, userData, actionType, actionData = {}) => {
@@ -32,6 +36,14 @@ export const checkAndUnlockBadges = async (userId, userData, actionType, actionD
     await updateDoc(userRef, {
       earnedBadges: [...earnedBadges, newBadgeEntry],
       trustScore: userData.trustScore >= 100 ? 100 : increment(5)
+    });
+
+    // Trigger Celebration
+    confetti({
+      particleCount: 150,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#129780', '#2b3231', '#ffffff']
     });
 
     // Notify with JSX
@@ -54,6 +66,12 @@ export const checkAndUnlockBadges = async (userId, userData, actionType, actionD
   if (userData.contributions >= 50) await unlock('COMMUNITY_PILLAR');
   if (userData.verified) await unlock('EXPERT_VOICE');
   
+  // Kudos Milestones
+  const kudos = userData.kudosCount || 0;
+  if (kudos >= 50) await unlock('COMMUNITY_FAVORITE');
+  if (kudos >= 100) await unlock('CROWD_PLEASER');
+  if (kudos >= 500) await unlock('LEGEND_OF_KINDNESS');
+
   if (actionType === 'endorsement') {
     const endorsements = userData.endorsements || {};
     const maxEndorsements = Object.values(endorsements).reduce((max, e) => Math.max(max, e.count || 0), 0);
@@ -61,6 +79,36 @@ export const checkAndUnlockBadges = async (userId, userData, actionType, actionD
   }
 
   return newBadges;
+};
+
+export const handleKudos = async (targetUserId, messageId, currentUserId) => {
+  if (!targetUserId || !messageId || !currentUserId) return;
+  if (targetUserId === currentUserId) {
+    toast.error("You can't kudos your own message!");
+    return;
+  }
+
+  try {
+    const messageRef = doc(db, 'messages', messageId);
+    const targetUserRef = doc(db, 'users', targetUserId);
+    
+    // Update target user kudos
+    await updateDoc(targetUserRef, {
+      kudosCount: increment(1),
+      trustScore: increment(0.5) // Small trust boost
+    });
+
+    // Check for badges
+    const targetSnap = await getDoc(targetUserRef);
+    if (targetSnap.exists()) {
+      await checkAndUnlockBadges(targetUserId, targetSnap.data(), 'kudos');
+    }
+
+    toast.success('Kudos sent! 👏', { position: 'bottom-center' });
+  } catch (err) {
+    console.error(err);
+    toast.error('Failed to send kudos');
+  }
 };
 
 export const updateStreak = async (userId, userData) => {

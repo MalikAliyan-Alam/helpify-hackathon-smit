@@ -145,22 +145,22 @@ export function VoiceNoteRecorder({ onSend, storageFolder = 'voiceNotes' }) {
 
   if (uploading) {
     return (
-      <div className="flex items-center gap-3 px-4 py-2 bg-[#f0f9f8] rounded-full animate-in fade-in">
-        <div className="w-4 h-4 border-2 border-[#129780] border-t-transparent rounded-full animate-spin"></div>
-        <span className="text-[10px] font-bold text-[#129780] uppercase tracking-wider">Uploading {Math.round(uploadProgress)}%</span>
+      <div className="flex items-center gap-3 px-4 py-2 bg-[var(--badge-green-bg)] rounded-full animate-in fade-in">
+        <div className="w-4 h-4 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin"></div>
+        <span className="text-[10px] font-bold text-[var(--accent)] uppercase tracking-wider">Uploading {Math.round(uploadProgress)}%</span>
       </div>
     );
   }
 
   if (audioURL) {
     return (
-      <div className="flex items-center gap-3 bg-white border border-gray-100 p-2 rounded-2xl shadow-lg animate-in slide-in-from-bottom-2">
+      <div className="flex items-center gap-3 bg-[var(--bg-card)] border border-[var(--border-color)] p-2 rounded-2xl shadow-lg animate-in slide-in-from-bottom-2">
         <audio src={audioURL} controls className="h-8 max-w-[150px]" />
         <div className="flex gap-1">
-          <button onClick={handleSend} className="w-8 h-8 rounded-full bg-[#129780] text-white flex items-center justify-center hover:bg-[#0f806c] transition-colors shadow-sm">
+          <button onClick={handleSend} className="w-8 h-8 rounded-full bg-[var(--accent)] text-white flex items-center justify-center hover:opacity-90 transition-colors shadow-sm">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
           </button>
-          <button onClick={handleDiscard} className="w-8 h-8 rounded-full bg-red-100 text-red-500 flex items-center justify-center hover:bg-red-200 transition-colors shadow-sm">
+          <button onClick={handleDiscard} className="w-8 h-8 rounded-full bg-[var(--badge-red-bg)] text-red-500 flex items-center justify-center hover:opacity-90 transition-colors shadow-sm">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </div>
@@ -171,7 +171,7 @@ export function VoiceNoteRecorder({ onSend, storageFolder = 'voiceNotes' }) {
   return (
     <div className="flex items-center gap-2">
       {isRecording && (
-        <div className="flex items-center gap-3 px-4 py-2 bg-red-50 text-red-500 rounded-full animate-in fade-in slide-in-from-left-2">
+        <div className="flex items-center gap-3 px-4 py-2 bg-[var(--badge-red-bg)] text-red-500 rounded-full animate-in fade-in slide-in-from-left-2">
           <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
           <span className="text-xs font-bold font-mono">{formatTime(recordingTime)}</span>
         </div>
@@ -191,7 +191,7 @@ export function VoiceNoteRecorder({ onSend, storageFolder = 'voiceNotes' }) {
         className={`p-2.5 rounded-full transition-all active:scale-95 touch-none ${
           isRecording 
             ? 'bg-red-500 text-white shadow-lg scale-110' 
-            : 'bg-gray-100 text-gray-400 hover:text-[#129780] hover:bg-[#f0f9f8]'
+            : 'bg-[var(--bg-secondary)] text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--badge-green-bg)]'
         }`}
         title="Hold to record voice note"
       >

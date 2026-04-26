@@ -10,6 +10,7 @@ import toast from 'react-hot-toast';
 import { VerificationModal } from '../components/VerificationModal';
 import { ReportModal } from '../components/ReportModal';
 import { BadgeShowcase } from '../components/BadgeShowcase';
+import { KudosButton } from '../components/KudosButton';
 import { BADGE_DEFINITIONS } from '../lib/gamification.jsx';
 
 export function ProfilePage() {
@@ -23,6 +24,7 @@ export function ProfilePage() {
   const location = userData?.location || 'Unknown Location';
   const trustScore = userData?.trustScore || 0;
   const contributions = userData?.contributions || 0;
+  const kudosCount = userData?.kudosCount || 0;
   const skills = userData?.skills?.length ? userData.skills : ['Add skills in edit profile'];
   const interests = userData?.interests?.length ? userData.interests : ['Add interests in edit profile'];
   const badges = userData?.badges?.length ? userData.badges : [];
@@ -142,6 +144,20 @@ export function ProfilePage() {
                 </div>
               );
             })}
+            {kudosCount > 0 && (
+              <div className="flex items-center gap-1.5 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full border border-white/20 shadow-sm animate-in fade-in zoom-in duration-500">
+                <span className="text-xs">👏</span>
+                <span className="text-[10px] font-black">{kudosCount}</span>
+              </div>
+            )}
+            {currentUser?.uid !== userData?.uid && (
+               <KudosButton 
+                  targetUserId={userData?.uid} 
+                  messageId={`profile-${userData?.uid}`} 
+                  kudosGiven={userData?.kudosVoters || []} 
+                  currentKudos={userData?.kudosCount || 0}
+               />
+            )}
           </div>
           {userData?.verified && (
             <div className="bg-[#129780] text-white p-1.5 rounded-full shadow-lg shadow-[#129780]/40 group relative cursor-help">
@@ -194,6 +210,14 @@ export function ProfilePage() {
               <div className="flex items-center justify-between border-b border-gray-200/60 pb-4">
                 <span className="text-sm font-medium text-gray-700">Contributions</span>
                 <span className="text-sm font-bold text-[#2b3231]">{contributions}</span>
+              </div>
+
+              <div className="flex items-center justify-between border-b border-gray-200/60 pb-4 group/kudos">
+                <span className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                   👏 Kudos Received
+                   <div className="w-1.5 h-1.5 rounded-full bg-[#129780] animate-pulse opacity-0 group-hover/kudos:opacity-100 transition-opacity"></div>
+                </span>
+                <span className="text-sm font-black text-[#129780] drop-shadow-[0_0_8px_rgba(18,151,128,0.2)]">{kudosCount}</span>
               </div>
 
               <div>

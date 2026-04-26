@@ -18,7 +18,9 @@ import { LiveSessionPage } from './pages/LiveSessionPage';
 import { AdminPanel } from './pages/AdminPanel';
 import { RestrictedPage } from './pages/RestrictedPage';
 import { LeaderboardPage } from './pages/LeaderboardPage';
+import { PollsPage } from './pages/PollsPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { Toaster } from 'react-hot-toast';
 
 function PrivateRoute({ children }) {
@@ -35,28 +37,30 @@ function PrivateRoute({ children }) {
 
 function App() {
   return (
-    <AuthProvider>
-      <Toaster 
-        position="bottom-right" 
-        toastOptions={{
-          style: {
-            background: '#fff',
-            color: '#2b3231',
-            borderRadius: '16px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-            border: '1px solid #f3f4f6',
-            fontWeight: '500',
-            fontSize: '14px',
-            padding: '12px 20px',
-          },
-          success: {
-            iconTheme: {
-              primary: '#129780',
-              secondary: '#fff',
+    <ThemeProvider>
+      <AuthProvider>
+        <Toaster 
+          position="bottom-right" 
+          toastOptions={{
+            className: 'dark:bg-slate-800 dark:text-white',
+            style: {
+              borderRadius: '16px',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+              border: '1px solid var(--card-border)',
+              background: 'var(--card-bg)',
+              color: 'var(--primary-text)',
+              fontWeight: '500',
+              fontSize: '14px',
+              padding: '12px 20px',
             },
-          },
-        }}
-      />
+            success: {
+              iconTheme: {
+                primary: '#129780',
+                secondary: '#fff',
+              },
+            },
+          }}
+        />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
@@ -90,6 +94,9 @@ function App() {
             <Route path="leaderboard" element={
               <PrivateRoute><LeaderboardPage /></PrivateRoute>
             } />
+            <Route path="polls" element={
+              <PrivateRoute><PollsPage /></PrivateRoute>
+            } />
             <Route path="sessions" element={
               <PrivateRoute><SessionsPage /></PrivateRoute>
             } />
@@ -106,7 +113,8 @@ function App() {
           </Route>
         </Routes>
       </BrowserRouter>
-    </AuthProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

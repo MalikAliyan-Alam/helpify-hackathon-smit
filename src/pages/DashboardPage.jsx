@@ -11,6 +11,10 @@ import toast from 'react-hot-toast';
 import { LeaderboardWidget } from '../components/LeaderboardWidget';
 import { StreakWidget } from '../components/StreakWidget';
 import { updateStreak } from '../lib/gamification.jsx';
+import { TopKudosWidget } from '../components/TopKudosWidget';
+import { PollsWidget } from '../components/PollsWidget';
+import { DailyChallengeBanner } from '../components/DailyChallengeBanner';
+import { DailyChallengeService } from '../lib/DailyChallengeService';
 
 export function DashboardPage() {
   const { currentUser, userData } = useAuth();
@@ -21,6 +25,20 @@ export function DashboardPage() {
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [notifications, setNotifications] = useState([]);
   const [bookings, setBookings] = useState([]);
+
+  // Challenge State
+  const [currentChallenge, setCurrentChallenge] = useState(null);
+  const [prevChampion, setPrevChampion] = useState(null);
+
+  useEffect(() => {
+    async function fetchChallenge() {
+      const challenge = await DailyChallengeService.getCurrentChallenge();
+      setCurrentChallenge(challenge);
+      const champion = await DailyChallengeService.getPreviousChampion();
+      setPrevChampion(champion);
+    }
+    fetchChallenge();
+  }, []);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -147,6 +165,14 @@ export function DashboardPage() {
         </p>
       </div>
 
+      {/* Daily Challenge Banner */}
+      {currentChallenge && (
+        <DailyChallengeBanner 
+          challenge={currentChallenge} 
+          request={currentChallenge} 
+        />
+      )}
+
       {/* Setup Availability CTA */}
       {(!userData?.availability?.slots || userData?.availability?.slots.length === 0) && (
         <Card className="bg-[#129780] border-none shadow-lg rounded-[24px] p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 animate-in zoom-in duration-500">
@@ -167,42 +193,42 @@ export function DashboardPage() {
 
       {/* Stats Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="bg-[#fdfcf9] border-none shadow-sm rounded-[24px] p-6 lg:p-8 flex flex-col justify-between">
+        <Card className="border-none shadow-sm rounded-[24px] p-6 lg:p-8 flex flex-col justify-between">
           <div>
-            <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-4">TRUST SCORE</p>
-            <h3 className="text-4xl font-bold text-[#2b3231] mb-4">{userData?.trustScore || 100}%</h3>
+            <p className="text-[var(--accent)] font-bold text-[10px] uppercase tracking-wider mb-4">TRUST SCORE</p>
+            <h3 className="text-4xl font-bold text-[var(--text-primary)] mb-4">{userData?.trustScore || 100}%</h3>
           </div>
-          <p className="text-gray-600 text-sm leading-relaxed">
+          <p className="text-[var(--text-secondary)] text-sm leading-relaxed">
             Driven by solved requests and consistent support.
           </p>
         </Card>
 
-        <Card className="bg-[#fdfcf9] border-none shadow-sm rounded-[24px] p-6 lg:p-8 flex flex-col justify-between">
+        <Card className="border-none shadow-sm rounded-[24px] p-6 lg:p-8 flex flex-col justify-between">
           <div>
-            <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-4">HELPING</p>
-            <h3 className="text-4xl font-bold text-[#2b3231] mb-4">{helpingCount}</h3>
+            <p className="text-[var(--accent)] font-bold text-[10px] uppercase tracking-wider mb-4">HELPING</p>
+            <h3 className="text-4xl font-bold text-[var(--text-primary)] mb-4">{helpingCount}</h3>
           </div>
-          <p className="text-gray-600 text-sm leading-relaxed">
+          <p className="text-[var(--text-secondary)] text-sm leading-relaxed">
             Requests where you are currently listed as a helper.
           </p>
         </Card>
 
-        <Card className="bg-[#fdfcf9] border-none shadow-sm rounded-[24px] p-6 lg:p-8 flex flex-col justify-between">
+        <Card className="border-none shadow-sm rounded-[24px] p-6 lg:p-8 flex flex-col justify-between">
           <div>
-            <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-4">OPEN REQUESTS</p>
-            <h3 className="text-4xl font-bold text-[#2b3231] mb-4">{openRequestsCount}</h3>
+            <p className="text-[var(--accent)] font-bold text-[10px] uppercase tracking-wider mb-4">OPEN REQUESTS</p>
+            <h3 className="text-4xl font-bold text-[var(--text-primary)] mb-4">{openRequestsCount}</h3>
           </div>
-          <p className="text-gray-600 text-sm leading-relaxed">
+          <p className="text-[var(--text-secondary)] text-sm leading-relaxed">
             Community requests currently active across the feed.
           </p>
         </Card>
 
-        <Card className="bg-[#fdfcf9] border-none shadow-sm rounded-[24px] p-6 lg:p-8 flex flex-col justify-between">
+        <Card className="border-none shadow-sm rounded-[24px] p-6 lg:p-8 flex flex-col justify-between">
           <div>
-            <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-4">AI PULSE</p>
-            <h3 className="text-4xl font-bold text-[#2b3231] leading-tight mb-4">{uniqueTagsCount || 0} trends</h3>
+            <p className="text-[var(--accent)] font-bold text-[10px] uppercase tracking-wider mb-4">AI PULSE</p>
+            <h3 className="text-4xl font-bold text-[var(--text-primary)] leading-tight mb-4">{uniqueTagsCount || 0} trends</h3>
           </div>
-          <p className="text-gray-600 text-sm leading-relaxed">
+          <p className="text-[var(--text-secondary)] text-sm leading-relaxed">
             Trend count detected in the latest request activity.
           </p>
         </Card>
@@ -213,47 +239,47 @@ export function DashboardPage() {
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-2">LIVE MOMENTUM</p>
-              <h3 className="text-2xl font-bold text-[#2b3231]">Upcoming Sessions</h3>
+              <p className="text-[var(--accent)] font-bold text-[10px] uppercase tracking-wider mb-2">LIVE MOMENTUM</p>
+              <h3 className="text-2xl font-bold text-[var(--text-primary)]">Upcoming Sessions</h3>
             </div>
             <button 
               onClick={() => navigate('/sessions')}
-              className="text-xs font-bold text-[#129780] hover:underline"
+              className="text-xs font-bold text-[var(--accent)] hover:underline"
             >
               View all sessions →
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {bookings.map(booking => (
-              <Card key={booking.id} className="bg-white border-none shadow-md rounded-[24px] p-6 flex flex-col relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-[#129780]/5 rounded-bl-full -mr-8 -mt-8 transition-all group-hover:scale-110"></div>
+              <Card key={booking.id} className="border-none shadow-md rounded-[24px] p-6 flex flex-col relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-[var(--accent)]/5 rounded-bl-full -mr-8 -mt-8 transition-all group-hover:scale-110"></div>
                 <div className="flex items-center gap-4 mb-4">
-                   <div className="bg-[#129780] text-white p-3 rounded-2xl">
+                   <div className="bg-[var(--accent)] text-white p-3 rounded-2xl">
                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15.6 11.6L22 7v10l-6.4-4.6z"></path><rect x="2" y="5" width="14" height="14" rx="2"></rect></svg>
                    </div>
                    <div>
-                     <p className="text-sm font-bold text-[#2b3231]">{booking.date}</p>
-                     <p className="text-xs text-[#129780] font-bold uppercase tracking-wider">{booking.slot}</p>
+                     <p className="text-sm font-bold text-[var(--text-primary)]">{booking.date}</p>
+                     <p className="text-xs text-[var(--accent)] font-bold uppercase tracking-wider">{booking.slot}</p>
                    </div>
                 </div>
-                <h4 className="font-bold text-gray-800 text-lg mb-2 truncate">{booking.postTitle}</h4>
+                <h4 className="font-bold text-[var(--text-primary)] text-lg mb-2 truncate">{booking.postTitle}</h4>
                 <div className="flex items-center gap-2 mb-6">
-                  <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-bold">
+                  <div className="w-6 h-6 rounded-full bg-[var(--bg-secondary)] flex items-center justify-center text-[10px] font-bold text-[var(--text-primary)]">
                     {(booking.role === 'helper' ? booking.requesterName : booking.helperName).charAt(0)}
                   </div>
-                  <p className="text-sm text-gray-500">
-                    {booking.role === 'helper' ? 'Helping' : 'Mentored by'} <span className="font-bold text-gray-700">{booking.role === 'helper' ? booking.requesterName : booking.helperName}</span>
+                  <p className="text-sm text-[var(--text-secondary)]">
+                    {booking.role === 'helper' ? 'Helping' : 'Mentored by'} <span className="font-bold text-[var(--text-primary)]">{booking.role === 'helper' ? booking.requesterName : booking.helperName}</span>
                   </p>
                 </div>
                 <div className="flex flex-col gap-3 mt-auto">
                   <Button 
                     onClick={() => navigate(`/session/${booking.id}`)}
-                    className="w-full rounded-full py-2.5 font-bold bg-[#129780] shadow-sm"
+                    className="w-full rounded-full py-2.5 font-bold shadow-sm"
                   >
                     Join Call
                   </Button>
                   <div className="flex items-center justify-between">
-                    <Badge variant="outline" className="bg-[#f0f9f8] text-[#129780] border-none text-[10px] py-1 px-3">Pending</Badge>
+                    <Badge variant="primary" className="border-none text-[10px] py-1 px-3">Pending</Badge>
                     <button 
                       onClick={async () => {
                         if(window.confirm('Cancel this session?')) {
@@ -282,13 +308,13 @@ export function DashboardPage() {
         <div>
           <div className="flex items-end justify-between mb-8">
             <div>
-              <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-2">RECENT REQUESTS</p>
-              <h3 className="text-3xl font-bold text-[#2b3231]">What the community<br/>needs right now</h3>
+              <p className="text-[var(--accent)] font-bold text-[10px] uppercase tracking-wider mb-2">RECENT REQUESTS</p>
+              <h3 className="text-3xl font-bold text-[var(--text-primary)]">What the community<br/>needs right now</h3>
             </div>
             <Button 
               variant="secondary" 
               onClick={() => navigate('/explore')}
-              className="rounded-full shadow-sm border-none bg-white w-14 h-14 flex items-center justify-center p-0 flex-col hover:bg-gray-50"
+              className="rounded-full shadow-sm border-none w-14 h-14 flex items-center justify-center p-0 flex-col"
             >
               <span className="text-[10px] font-bold leading-tight">Go to</span>
               <span className="text-[10px] font-bold leading-tight">feed</span>
@@ -300,34 +326,34 @@ export function DashboardPage() {
               <div className="py-12 text-center text-gray-500 font-medium">Loading community requests...</div>
             ) : posts.length > 0 ? (
               posts.map((post) => (
-                <Card key={post.id} className="bg-white border-none shadow-sm rounded-[24px] p-6 lg:p-8 flex flex-col">
+                <Card key={post.id} className="border-none shadow-sm rounded-[24px] p-6 lg:p-8 flex flex-col">
                   <div className="flex flex-wrap gap-2 mb-4">
-                    <Badge variant="outline" className="border-gray-200 text-[#129780] bg-[#f0f9f8]">{post.category || 'General'}</Badge>
-                    <Badge variant="destructive" className="bg-[#fef2f2] text-[#ef4444] border-none">{post.urgency || 'Normal'}</Badge>
-                    <Badge variant="outline" className={`border-none ${post.status?.toLowerCase() === 'solved' ? 'bg-green-500/20 text-green-400' : 'border-gray-200 text-[#129780] bg-[#f0f9f8]'}`}>
+                    <Badge variant="primary">{post.category || 'General'}</Badge>
+                    <Badge variant="destructive">{post.urgency || 'Normal'}</Badge>
+                    <Badge variant="outline" className={`border-none ${post.status?.toLowerCase() === 'solved' ? 'bg-green-500/20 text-green-400' : 'bg-[var(--badge-green-bg)] text-[var(--accent)]'}`}>
                       {post.status || 'Open'}
                     </Badge>
                   </div>
-                  <h4 className="font-bold text-xl leading-snug mb-3">{post.title}</h4>
-                  <p className="text-gray-600 text-[15px] leading-relaxed mb-6">
+                  <h4 className="font-bold text-xl leading-snug mb-3 text-[var(--text-primary)]">{post.title}</h4>
+                  <p className="text-[var(--text-secondary)] text-[15px] leading-relaxed mb-6">
                     {post.description}
                   </p>
                   {post.tags && post.tags.length > 0 && (
                     <div className="flex flex-wrap gap-2 mb-8">
                       {post.tags.map((tag, i) => (
-                        <Badge key={i} variant="outline" className="bg-[#f6f8f9] border-none text-gray-600">{tag}</Badge>
+                        <Badge key={i} variant="outline" className="border-none bg-[var(--bg-secondary)] text-[var(--text-secondary)]">{tag}</Badge>
                       ))}
                     </div>
                   )}
                   <div className="flex items-center justify-between mt-auto">
                     <div>
-                      <p className="font-bold text-sm text-[#2b3231]">{post.authorName || 'Anonymous'}</p>
-                      <p className="text-xs text-gray-500">{post.authorLocation || 'Unknown'} • {post.helpers?.length || 0} helpers interested</p>
+                      <p className="font-bold text-sm text-[var(--text-primary)]">{post.authorName || 'Anonymous'}</p>
+                      <p className="text-xs text-[var(--text-secondary)]">{post.authorLocation || 'Unknown'} • {post.helpers?.length || 0} helpers interested</p>
                     </div>
                     <Button 
                       variant="outline" 
                       onClick={() => navigate(`/request/${post.id}`)}
-                      className="rounded-full border-gray-200 shadow-sm bg-white font-semibold px-6 py-2"
+                      className="rounded-full border-[var(--border-color)] shadow-sm font-semibold px-6 py-2"
                     >
                       Open details
                     </Button>
@@ -345,26 +371,26 @@ export function DashboardPage() {
         {/* Sidebar */}
         <div className="flex flex-col gap-8">
           {/* AI Insights */}
-          <Card className="bg-white border-none shadow-sm rounded-[24px] p-8">
-            <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-2">AI INSIGHTS</p>
-            <h3 className="text-xl font-bold text-[#2b3231] mb-6">Suggested actions for you</h3>
+          <Card className="border-none shadow-sm rounded-[24px] p-8">
+            <p className="text-[var(--accent)] font-bold text-[10px] uppercase tracking-wider mb-2">AI INSIGHTS</p>
+            <h3 className="text-xl font-bold text-[var(--text-primary)] mb-6">Suggested actions for you</h3>
 
             <div className="space-y-5">
-              <div className="flex items-center justify-between border-b border-gray-100 pb-5">
-                <span className="text-sm text-gray-600">Most requested category</span>
-                <span className="text-sm font-bold text-[#2b3231]">{mostRequestedCategory}</span>
+              <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-5">
+                <span className="text-sm text-[var(--text-secondary)]">Most requested category</span>
+                <span className="text-sm font-bold text-[var(--text-primary)]">{mostRequestedCategory}</span>
               </div>
-              <div className="flex items-center justify-between border-b border-gray-100 pb-5">
-                <span className="text-sm text-gray-600">Your strongest trust driver</span>
-                <span className="text-sm font-bold text-[#2b3231]">Community Builder</span>
+              <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-5">
+                <span className="text-sm text-[var(--text-secondary)]">Your strongest trust driver</span>
+                <span className="text-sm font-bold text-[var(--text-primary)]">Community Builder</span>
               </div>
-              <div className="flex items-start justify-between border-b border-gray-100 pb-5 gap-4">
-                <span className="text-sm text-gray-600">AI says you can mentor in</span>
-                <span className="text-sm font-bold text-[#2b3231] text-right">{mentorSkills}</span>
+              <div className="flex items-start justify-between border-b border-[var(--border-color)] pb-5 gap-4">
+                <span className="text-sm text-[var(--text-secondary)]">AI says you can mentor in</span>
+                <span className="text-sm font-bold text-[var(--text-primary)] text-right">{mentorSkills}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Your active requests</span>
-                <span className="text-sm font-bold text-[#2b3231]">{userActiveRequests}</span>
+                <span className="text-sm text-[var(--text-secondary)]">Your active requests</span>
+                <span className="text-sm font-bold text-[var(--text-primary)]">{userActiveRequests}</span>
               </div>
             </div>
           </Card>
@@ -376,23 +402,46 @@ export function DashboardPage() {
             freezes={userData?.streakFreezes || 0} 
           />
 
+          {/* Top Kudos Widget */}
+          <TopKudosWidget />
+
+          {/* Polls Widget */}
+          <PollsWidget />
+
           {/* Leaderboard Widget */}
           <LeaderboardWidget />
 
+          {/* Yesterday's Champion */}
+          {prevChampion && (
+            <Card className="bg-yellow-400 border-none p-6 rounded-[24px] shadow-lg shadow-yellow-400/20 relative overflow-hidden group hover:scale-[1.02] transition-all">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-white/20 rounded-full -mr-12 -mt-12 blur-xl group-hover:bg-white/30 transition-all"></div>
+              <p className="text-[#2b3231]/60 font-black text-[10px] uppercase tracking-widest mb-4">PREVIOUS CHAMPION</p>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-[#2b3231] flex items-center justify-center text-xl shadow-lg border-2 border-white/20">
+                  🏅
+                </div>
+                <div>
+                   <h4 className="font-bold text-[#2b3231]">{prevChampion.winnerName || 'Community Legend'}</h4>
+                   <p className="text-[10px] font-medium text-[#2b3231]/60">Solved: {prevChampion.title}</p>
+                </div>
+              </div>
+            </Card>
+          )}
+
           {/* Notifications */}
-          <Card className="bg-[#fdfcf9] border-none shadow-sm rounded-[24px] p-8">
-            <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-2">NOTIFICATIONS</p>
-            <h3 className="text-xl font-bold text-[#2b3231] mb-6">Latest updates</h3>
+          <Card className="border-none shadow-sm rounded-[24px] p-8">
+            <p className="text-[var(--accent)] font-bold text-[10px] uppercase tracking-wider mb-2">NOTIFICATIONS</p>
+            <h3 className="text-xl font-bold text-[var(--text-primary)] mb-6">Latest updates</h3>
 
             <div className="space-y-4">
               {notifications.length === 0 ? (
                 <div className="text-sm text-gray-500 py-4 text-center">No recent updates.</div>
               ) : (
                 notifications.map(notif => (
-                  <div key={notif.id} className="bg-white border border-gray-100 rounded-[16px] p-4 flex items-center justify-between gap-4">
+                  <div key={notif.id} className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[16px] p-4 flex items-center justify-between gap-4">
                     <div>
-                      <p className="text-sm font-bold text-[#2b3231] leading-snug mb-1">{notif.message}</p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-sm font-bold text-[var(--text-primary)] leading-snug mb-1">{notif.message}</p>
+                      <p className="text-xs text-[var(--text-secondary)]">
                         {notif.type} • {notif.createdAt ? (() => {
                           const diff = Math.floor((new Date() - notif.createdAt.toDate()) / 60000);
                           if (diff < 1) return 'Just now';

@@ -3,11 +3,11 @@ import { cn } from '../../lib/utils';
 
 export function Badge({ children, variant = 'default', className, ...props }) {
   const variants = {
-    default: 'bg-gray-100 text-gray-700 border border-gray-200',
-    primary: 'bg-[#e6f4ea] text-[#1e8e3e] border border-[#e6f4ea]', // Green-ish
-    destructive: 'bg-[#fce8e6] text-[#d93025] border border-[#fce8e6]', // Red-ish
-    outline: 'border border-gray-300 text-gray-700 bg-transparent',
-    secondary: 'bg-[#e8f0fe] text-[#1a73e8] border border-[#e8f0fe]', // Blue-ish
+    default: 'bg-[var(--badge-gray-bg)] text-[var(--badge-gray-text)] border border-[var(--border-color)]',
+    primary: 'bg-[var(--badge-green-bg)] text-[var(--badge-green-text)] border border-[var(--badge-green-bg)]',
+    destructive: 'bg-[var(--badge-red-bg)] text-[var(--badge-red-text)] border border-[var(--badge-red-bg)]',
+    outline: 'border border-[var(--border-color)] text-[var(--text-secondary)] bg-transparent',
+    secondary: 'bg-[var(--bg-secondary)] text-[var(--accent)] border border-[var(--border-color)]',
   };
 
   return (

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../lib/firebase';
 import { collection, query, orderBy, limit, onSnapshot, getDocs, where } from 'firebase/firestore';
+import { BADGE_DEFINITIONS } from '../lib/gamification.jsx';
+import { KudosButton } from '../components/KudosButton';
 import { Card } from '../components/ui/Card';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -63,9 +65,9 @@ export function LeaderboardPage() {
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/5 rounded-full -ml-32 -mb-32 blur-3xl"></div>
         
         <div className="relative z-10">
-          <p className="text-[#129780] font-bold text-xs uppercase tracking-[0.3em] mb-4">REPUTATION & IMPACT</p>
+          <p className="text-[var(--accent)] font-bold text-xs uppercase tracking-[0.3em] mb-4">REPUTATION & IMPACT</p>
           <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-6">Hall of Heroes</h1>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-gray-300 text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
             Recognizing the champions of our community who consistently provide world-class help and mentorship.
           </p>
 
@@ -93,16 +95,16 @@ export function LeaderboardPage() {
           {/* Silver - Rank 2 */}
           <div className="flex flex-col items-center gap-4 animate-in slide-in-from-bottom-8 duration-700 delay-100">
             <div className="relative">
-              <div className="w-24 h-24 rounded-3xl bg-slate-200 flex items-center justify-center text-4xl border-4 border-white shadow-xl overflow-hidden">
+              <div className="w-24 h-24 rounded-3xl bg-[var(--bg-secondary)] flex items-center justify-center text-4xl border-4 border-[var(--border-color)] shadow-xl overflow-hidden text-[var(--text-primary)]">
                 {leaders[1].name?.charAt(0)}
               </div>
-              <div className="absolute -top-3 -right-3 w-10 h-10 bg-gradient-to-br from-slate-300 to-slate-500 rounded-full flex items-center justify-center text-lg shadow-lg border-2 border-white">🥈</div>
+              <div className="absolute -top-3 -right-3 w-10 h-10 bg-gradient-to-br from-slate-300 to-slate-500 rounded-full flex items-center justify-center text-lg shadow-lg border-2 border-[var(--bg-card)]">🥈</div>
             </div>
             <div className="text-center">
-              <h3 className="font-bold text-[#2b3231]">{leaders[1].name}</h3>
-              <p className="text-[#129780] font-bold text-xs">{leaders[1].trustScore}% Trust</p>
+              <h3 className="font-bold text-[var(--text-primary)]">{leaders[1].name}</h3>
+              <p className="text-[var(--accent)] font-bold text-xs">{Math.min(100, leaders[1].trustScore || 0)}% Trust</p>
             </div>
-            <div className="w-48 h-32 bg-white/80 backdrop-blur-md rounded-t-[32px] border border-gray-100 shadow-sm flex flex-col items-center justify-center p-4">
+            <div className="w-48 h-32 bg-[var(--bg-card)] backdrop-blur-md rounded-t-[32px] border border-[var(--border-color)] shadow-sm flex flex-col items-center justify-center p-4">
                <span className="text-slate-400 font-black text-2xl">2ND</span>
             </div>
           </div>
@@ -110,35 +112,35 @@ export function LeaderboardPage() {
           {/* Gold - Rank 1 */}
           <div className="flex flex-col items-center gap-4 animate-in slide-in-from-bottom-12 duration-1000">
             <div className="relative">
-              <div className="w-32 h-32 rounded-[40px] bg-yellow-100 flex items-center justify-center text-5xl border-4 border-[#129780] shadow-2xl overflow-hidden scale-110">
+              <div className="w-32 h-32 rounded-[40px] bg-[var(--bg-secondary)] flex items-center justify-center text-5xl border-4 border-[var(--accent)] shadow-2xl overflow-hidden scale-110 text-[var(--text-primary)]">
                 {leaders[0].name?.charAt(0)}
               </div>
-              <div className="absolute -top-4 -right-4 w-12 h-12 bg-gradient-to-br from-yellow-400 to-amber-600 rounded-full flex items-center justify-center text-2xl shadow-xl border-4 border-white">🥇</div>
+              <div className="absolute -top-4 -right-4 w-12 h-12 bg-gradient-to-br from-yellow-400 to-amber-600 rounded-full flex items-center justify-center text-2xl shadow-xl border-4 border-[var(--bg-card)]">🥇</div>
             </div>
             <div className="text-center mt-2">
-              <h3 className="font-black text-xl text-[#2b3231]">{leaders[0].name}</h3>
-              <p className="text-[#129780] font-bold text-sm">{leaders[0].trustScore}% Trust • Elite</p>
+              <h3 className="font-black text-xl text-[var(--text-primary)]">{leaders[0].name}</h3>
+              <p className="text-[var(--accent)] font-bold text-sm">{Math.min(100, leaders[0].trustScore || 0)}% Trust • Elite</p>
             </div>
-            <div className="w-56 h-48 bg-white shadow-2xl rounded-t-[40px] border border-gray-100 flex flex-col items-center justify-center p-6 relative">
+            <div className="w-56 h-48 bg-[var(--bg-card)] shadow-2xl rounded-t-[40px] border border-[var(--border-color)] flex flex-col items-center justify-center p-6 relative">
                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-400"></div>
                <span className="text-amber-500 font-black text-4xl">1ST</span>
-               <p className="text-xs text-gray-400 font-bold uppercase mt-2">{leaders[0].contributions} HELPS</p>
+               <p className="text-xs text-[var(--text-secondary)] font-bold uppercase mt-2">{leaders[0].contributions} HELPS</p>
             </div>
           </div>
 
           {/* Bronze - Rank 3 */}
           <div className="flex flex-col items-center gap-4 animate-in slide-in-from-bottom-8 duration-700 delay-200">
             <div className="relative">
-              <div className="w-24 h-24 rounded-3xl bg-orange-100 flex items-center justify-center text-4xl border-4 border-white shadow-xl overflow-hidden">
+              <div className="w-24 h-24 rounded-3xl bg-[var(--bg-secondary)] flex items-center justify-center text-4xl border-4 border-[var(--border-color)] shadow-xl overflow-hidden text-[var(--text-primary)]">
                 {leaders[2].name?.charAt(0)}
               </div>
-              <div className="absolute -top-3 -right-3 w-10 h-10 bg-gradient-to-br from-orange-300 to-orange-600 rounded-full flex items-center justify-center text-lg shadow-lg border-2 border-white">🥉</div>
+              <div className="absolute -top-3 -right-3 w-10 h-10 bg-gradient-to-br from-orange-300 to-orange-600 rounded-full flex items-center justify-center text-lg shadow-lg border-2 border-[var(--bg-card)]">🥉</div>
             </div>
             <div className="text-center">
-              <h3 className="font-bold text-[#2b3231]">{leaders[2].name}</h3>
-              <p className="text-[#129780] font-bold text-xs">{leaders[2].trustScore}% Trust</p>
+              <h3 className="font-bold text-[var(--text-primary)]">{leaders[2].name}</h3>
+              <p className="text-[var(--accent)] font-bold text-xs">{Math.min(100, leaders[2].trustScore || 0)}% Trust</p>
             </div>
-            <div className="w-48 h-24 bg-white/60 backdrop-blur-md rounded-t-[32px] border border-gray-100 shadow-sm flex flex-col items-center justify-center p-4">
+            <div className="w-48 h-24 bg-[var(--bg-card)] backdrop-blur-md rounded-t-[32px] border border-[var(--border-color)] shadow-sm flex flex-col items-center justify-center p-4">
                <span className="text-orange-400 font-black text-xl">3RD</span>
             </div>
           </div>
@@ -159,24 +161,39 @@ export function LeaderboardPage() {
             return (
               <Card 
                 key={user.id} 
-                className={`bg-white border-none shadow-sm rounded-[24px] p-4 flex items-center gap-6 transition-all hover:shadow-md hover:scale-[1.01] ${isMe ? 'ring-2 ring-[#129780] bg-[#f0f9f8]' : ''}`}
+                className={`border-none shadow-sm rounded-[24px] p-4 flex items-center gap-6 transition-all hover:shadow-md hover:scale-[1.01] ${isMe ? 'ring-2 ring-[var(--accent)] bg-[var(--badge-green-bg)]' : ''}`}
               >
                 <div className={`w-12 text-center ${rankStyle}`}>
                   {getRankBadge(index)}
                 </div>
 
-                <div className="w-12 h-12 rounded-2xl bg-[#2b3231] flex items-center justify-center text-white font-bold shrink-0 relative">
+                <div className="w-12 h-12 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-color)] flex items-center justify-center text-[var(--text-primary)] font-bold shrink-0 relative">
                   {user.name?.charAt(0).toUpperCase()}
                   {user.verified && (
-                    <div className="absolute -bottom-1 -right-1 bg-[#129780] text-white p-0.5 rounded-full border-2 border-white">
+                    <div className="absolute -bottom-1 -right-1 bg-[var(--accent)] text-white p-0.5 rounded-full border-2 border-[var(--bg-card)]">
                       <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     </div>
                   )}
                 </div>
 
                 <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <h4 className="font-bold text-[#2b3231]">{user.name}</h4>
+                  <div className="flex items-center gap-3">
+                    <h4 className="font-bold text-[var(--text-primary)] truncate">{user.name}</h4>
+                    <div className="flex gap-1.5 shrink-0">
+                      {user.pinnedBadges?.map(id => (
+                        <span key={id} title={BADGE_DEFINITIONS[id]?.name} className="text-sm w-6 h-6 flex items-center justify-center bg-[var(--bg-secondary)] backdrop-blur-sm rounded-full shadow-sm border border-[var(--border-color)] text-[var(--text-primary)]">
+                          {BADGE_DEFINITIONS[id]?.icon}
+                        </span>
+                      ))}
+                    </div>
+                    {user.id !== currentUser.uid && (
+                      <KudosButton 
+                        targetUserId={user.id} 
+                        messageId={`profile-${user.id}`} 
+                        kudosGiven={user.kudosVoters || []} 
+                        currentKudos={user.kudosCount || 0}
+                      />
+                    )}
                     {isMe && <span className="bg-[#129780] text-white text-[8px] font-black uppercase px-2 py-0.5 rounded-full">YOU</span>}
                   </div>
                   <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
@@ -186,12 +203,12 @@ export function LeaderboardPage() {
 
                 <div className="flex items-center gap-8 pr-4">
                   <div className="text-center">
-                    <p className="text-[10px] text-gray-400 font-bold uppercase mb-0.5">Trust</p>
-                    <p className="text-sm font-black text-[#129780]">{user.trustScore}%</p>
+                    <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase mb-0.5">Trust</p>
+                    <p className="text-sm font-black text-[var(--accent)]">{Math.min(100, user.trustScore || 0)}%</p>
                   </div>
                   <div className="text-center hidden sm:block">
-                    <p className="text-[10px] text-gray-400 font-bold uppercase mb-0.5">Helps</p>
-                    <p className="text-sm font-black text-[#2b3231]">{user.contributions || 0}</p>
+                    <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase mb-0.5">Helps</p>
+                    <p className="text-sm font-black text-[var(--text-primary)]">{user.contributions || 0}</p>
                   </div>
                 </div>
               </Card>

@@ -70,9 +70,9 @@ export function ExplorePage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-8 items-start">
         {/* Filters Sidebar */}
-        <div className="bg-[#f6f3eb] rounded-[24px] p-6 lg:p-8 border border-gray-200/50">
-          <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-2">FILTERS</p>
-          <h3 className="text-3xl font-bold text-[#2b3231] mb-8">Refine the feed</h3>
+        <div className="bg-[var(--bg-card)] rounded-[24px] p-6 lg:p-8 border border-[var(--border-color)]">
+          <p className="text-[var(--accent)] font-bold text-[10px] uppercase tracking-wider mb-2">FILTERS</p>
+          <h3 className="text-3xl font-bold text-[var(--text-primary)] mb-8">Refine the feed</h3>
 
           <div className="space-y-6">
             <div>
@@ -80,7 +80,7 @@ export function ExplorePage() {
               <select 
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#129780] appearance-none"
+                className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] appearance-none"
               >
                 <option>All categories</option>
                 <option>Web Development</option>
@@ -94,7 +94,7 @@ export function ExplorePage() {
               <select 
                 value={urgencyFilter}
                 onChange={(e) => setUrgencyFilter(e.target.value)}
-                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#129780] appearance-none"
+                className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] appearance-none"
               >
                 <option>All urgency levels</option>
                 <option>High</option>
@@ -110,7 +110,7 @@ export function ExplorePage() {
                 value={skillsFilter}
                 onChange={(e) => setSkillsFilter(e.target.value)}
                 placeholder="React, Figma, Git/GitHub" 
-                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#129780]"
+                className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               />
             </div>
 
@@ -121,13 +121,13 @@ export function ExplorePage() {
                 value={locationFilter}
                 onChange={(e) => setLocationFilter(e.target.value)}
                 placeholder="Karachi, Lahore, Remote" 
-                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#129780]"
+                className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               />
             </div>
             
             <Button 
               variant="outline" 
-              className="w-full mt-4 border-gray-200 shadow-sm bg-white font-semibold"
+              className="w-full mt-4 border-[var(--border-color)] shadow-sm font-semibold"
               onClick={() => {
                 setCategoryFilter('All categories');
                 setUrgencyFilter('All urgency levels');
@@ -146,22 +146,22 @@ export function ExplorePage() {
              <div className="py-12 text-center text-gray-500 font-medium">Loading community requests...</div>
           ) : filteredPosts.length > 0 ? (
             filteredPosts.map(post => (
-              <Card key={post.id} className="bg-white border-none shadow-sm rounded-[24px] p-6 lg:p-8 flex flex-col">
+              <Card key={post.id} className="border-none shadow-sm rounded-[24px] p-6 lg:p-8 flex flex-col">
                 <div className="flex flex-wrap gap-2 mb-4">
-                  <Badge variant="outline" className="border-gray-200 text-[#129780] bg-[#f0f9f8]">{post.category || 'General'}</Badge>
+                  <Badge variant="primary">{post.category || 'General'}</Badge>
                   <Badge variant="destructive" className="bg-[#fef2f2] text-[#ef4444] border-none">{post.urgency || 'Normal'}</Badge>
                   <Badge variant="outline" className={`border-none ${post.status?.toLowerCase() === 'solved' ? 'bg-green-500/20 text-green-400' : 'border-gray-200 text-[#129780] bg-[#f0f9f8]'}`}>
                     {post.status || 'Open'}
                   </Badge>
                 </div>
-                <h4 className="font-bold text-xl leading-snug mb-3">{post.title}</h4>
-                <p className="text-gray-600 text-[15px] leading-relaxed mb-6">
+                <h4 className="font-bold text-xl leading-snug mb-3 text-[var(--text-primary)]">{post.title}</h4>
+                <p className="text-[var(--text-secondary)] text-[15px] leading-relaxed mb-6">
                   {post.description}
                 </p>
                 {post.tags && post.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-8">
                     {post.tags.map((tag, i) => (
-                      <Badge key={i} variant="outline" className="bg-[#f6f8f9] border-none text-gray-600">{tag}</Badge>
+                      <Badge key={i} variant="outline" className="border-none bg-[var(--bg-secondary)] text-[var(--text-secondary)]">{tag}</Badge>
                     ))}
                   </div>
                 )}
@@ -185,7 +185,7 @@ export function ExplorePage() {
                   <Button 
                     variant="outline" 
                     onClick={() => navigate(`/request/${post.id}`)}
-                    className="rounded-full border-gray-200 shadow-sm bg-white font-semibold px-6 py-2"
+                    className="rounded-full border-[var(--border-color)] shadow-sm font-semibold px-6 py-2"
                   >
                     Open details
                   </Button>

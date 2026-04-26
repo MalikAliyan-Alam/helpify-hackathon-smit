@@ -1,26 +1,59 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
-@theme {
+:root {
   --font-sans: 'Outfit', sans-serif;
   
-  --color-primary-bg: #f6f3eb;
-  --color-primary-text: #2b3231;
-  --color-accent: #129780;
-  --color-accent-hover: #0e7866;
-  --color-card-bg: #ffffff;
+  /* Light Mode Variables */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f6f3eb;
+  --bg-card: #ffffff;
+  --text-primary: #1a1a1a;
+  --text-secondary: #666666;
+  --border-color: #e0e0e0;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --shadow: rgba(0, 0, 0, 0.05);
+  --accent: #129780;
+  --accent-hover: #0e7866;
+
+  /* Badge System - Standard */
+  --badge-green-bg: #e6f4ea;
+  --badge-green-text: #1e8e3e;
+  --badge-red-bg: #fce8e6;
+  --badge-red-text: #d93025;
+  --badge-gray-bg: #f1f3f4;
+  --badge-gray-text: #5f6368;
+}
+
+[data-theme="dark"] {
+  /* Dark Mode Variables */
+  --bg-primary: #0d0d0d;
+  --bg-secondary: #1a1a1a;
+  --bg-card: #1e1e1e;
+  --text-primary: #f0f0f0;
+  --text-secondary: #a0a0a0;
+  --border-color: #2a2a2a;
+  --glass-bg: rgba(30, 30, 30, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --shadow: rgba(0, 0, 0, 0.4);
   
-  --color-badge-green-bg: #e6f4ea;
-  --color-badge-green-text: #1e8e3e;
-  --color-badge-red-bg: #fce8e6;
-  --color-badge-red-text: #d93025;
-  --color-badge-gray-bg: #f1f3f4;
-  --color-badge-gray-text: #5f6368;
+  /* Badges - Dark Mode */
+  --badge-green-bg: rgba(18, 151, 128, 0.1);
+  --badge-green-text: #2dd4bf;
+  --badge-red-bg: rgba(239, 68, 68, 0.1);
+  --badge-red-text: #ef4444;
+  --badge-gray-bg: rgba(255, 255, 255, 0.05);
+  --badge-gray-text: #94a3b8;
+}
+
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 body {
-  background-color: var(--color-primary-bg);
-  color: var(--color-primary-text);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -28,10 +61,18 @@ body {
   padding: 0;
 }
 
-/* Custom Utilities for pixel perfect match */
+/* Custom Utilities */
 .glass-effect {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.card-premium {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px var(--shadow);
+  border-radius: 24px;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -43,10 +84,10 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #e2e8f0;
+  background: var(--border-color);
   border-radius: 10px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #cbd5e1;
+  background: var(--text-secondary);
 }

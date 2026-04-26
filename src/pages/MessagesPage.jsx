@@ -4,10 +4,9 @@ import { Button } from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../lib/firebase';
 import { collection, query, where, onSnapshot, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
-import { storage } from '../lib/firebase';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import toast from 'react-hot-toast';
 import { VoiceNoteRecorder } from '../components/VoiceNoteRecorder';
+import { KudosButton } from '../components/KudosButton';
 
 export function MessagesPage() {
   const { currentUser, userData } = useAuth();
@@ -153,9 +152,19 @@ export function MessagesPage() {
               messages.map((msg) => (
                 <div key={msg.id} className="bg-white border border-gray-100 rounded-[16px] p-5 flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-sm text-[#2b3231] mb-2 truncate">
-                      {msg.senderName} → {msg.receiverName}
-                    </p>
+                    <div className="flex items-center justify-between gap-4 mb-2">
+                      <p className="font-bold text-sm text-[#2b3231] truncate">
+                        {msg.senderName} → {msg.receiverName}
+                      </p>
+                      {msg.senderId !== currentUser.uid && (
+                        <KudosButton 
+                          targetUserId={msg.senderId} 
+                          messageId={msg.id} 
+                          kudosGiven={msg.kudosGiven} 
+                          currentKudos={msg.kudosGiven?.length || 0}
+                        />
+                      )}
+                    </div>
                     <p className="text-gray-600 text-sm leading-relaxed break-words">
                       {msg.audioURL ? (
                         <div className="mt-2">
@@ -206,9 +215,10 @@ export function MessagesPage() {
             </div>
 
             <div className="flex items-center gap-3">
-              <Button type="submit" disabled={sending} className="flex-1 rounded-full font-semibold py-3 text-base">
+              <Button type="submit" disabled={sending} className="flex-1 rounded-full font-semibold py-3 text-base shadow-md">
                 {sending ? 'Sending...' : 'Send'}
               </Button>
+              
               <VoiceNoteRecorder 
                 onSend={handleVoiceSend} 
                 storageFolder={`voiceNotes/messages/${currentUser.uid}`} 

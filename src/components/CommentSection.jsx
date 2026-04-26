@@ -22,7 +22,16 @@ import toast from 'react-hot-toast';
 import { VoiceNoteRecorder } from './VoiceNoteRecorder';
 import { ReportModal } from './ReportModal';
 
-export function CommentSection({ postId, postTitle, authorId, authorName, helpers = [] }) {
+export function CommentSection({ 
+  postId, 
+  postTitle, 
+  authorId, 
+  authorName, 
+  helpers = [],
+  isChallenge = false,
+  challengeWinnerId = null,
+  onSelectWinner = null
+}) {
   const { currentUser, userData, isAccountRestricted } = useAuth();
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [reportedHelper, setReportedHelper] = useState(null);
@@ -369,14 +378,14 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
   );
 
   return (
-    <Card className="bg-[#fdfcf9] border-none shadow-sm rounded-[24px] p-6 lg:p-8 mt-2 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <Card className="bg-[var(--bg-card)] border border-[var(--accent)]/10 shadow-sm rounded-[24px] p-6 lg:p-8 mt-2 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-1">COMMUNITY CHAT</p>
-          <h3 className="text-xl font-bold text-[#2b3231]">Help coordination</h3>
+          <p className="text-[var(--accent)] font-bold text-[10px] uppercase tracking-wider mb-1">COMMUNITY CHAT</p>
+          <h3 className="text-xl font-bold text-[var(--text-primary)]">Help coordination</h3>
         </div>
-        <div className="bg-[#f0f9f8] px-3 py-1 rounded-full">
-           <p className="text-[#129780] text-[10px] font-bold uppercase">{comments.length} messages</p>
+        <div className="bg-[var(--accent)]/10 px-3 py-1 rounded-full">
+           <p className="text-[var(--accent)] text-[10px] font-bold uppercase">{comments.length} messages</p>
         </div>
       </div>
 
@@ -389,8 +398,8 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
             <div className="w-6 h-6 border-2 border-[#129780] border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : comments.length === 0 ? (
-          <div className="bg-white/50 rounded-[20px] p-6 text-center border border-dashed border-gray-200">
-            <p className="text-gray-500 text-sm italic">No messages yet. Coordinate your help here!</p>
+          <div className="bg-[var(--bg-secondary)] rounded-[20px] p-6 text-center border border-dashed border-[var(--border-color)]">
+            <p className="text-[var(--text-secondary)] text-sm italic">No messages yet. Coordinate your help here!</p>
           </div>
         ) : (
           comments.map((comment) => {
@@ -400,12 +409,12 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
             
             return (
               <div key={comment.id} className={`flex gap-3 ${isMe ? 'flex-row-reverse' : ''}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-[10px] font-bold shrink-0 mt-1 ${isMe ? 'bg-[#129780]' : 'bg-[#2b3231]'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-[10px] font-bold shrink-0 mt-1 ${isMe ? 'bg-[var(--accent)]' : 'bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)]'}`}>
                   {comment.userName?.charAt(0).toUpperCase() || 'U'}
                 </div>
                 <div className={`flex flex-col max-w-[80%] ${isMe ? 'items-end' : ''}`}>
                   <div className="flex items-center gap-2 mb-1 px-1">
-                    <span className="font-bold text-[#2b3231] text-[11px]">{isMe ? 'You' : comment.userName}</span>
+                    <span className="font-bold text-[var(--text-primary)] text-[11px]">{isMe ? 'You' : comment.userName}</span>
                     {!isMe && (
                       <button 
                         onClick={() => {
@@ -420,18 +429,34 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
                       </button>
                     )}
                     {isAuthor && (
-                      <span className="bg-[#129780]/10 text-[#129780] text-[8px] font-bold px-1.5 py-0.5 rounded uppercase tracking-tighter">Author</span>
+                      <span className="bg-[var(--accent)]/10 text-[var(--accent)] text-[8px] font-bold px-1.5 py-0.5 rounded uppercase tracking-tighter">Author</span>
                     )}
-                    <span className="text-[9px] text-gray-400">
+                    <span className="text-[9px] text-[var(--text-secondary)]">
                       {comment.createdAt?.toDate ? new Date(comment.createdAt.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '...'}
                     </span>
                   </div>
                   <div className="relative group">
-                    <div className={`p-3 rounded-[18px] text-sm leading-relaxed shadow-sm transition-all ${
+                    <div className={`p-3 rounded-[18px] text-sm leading-relaxed shadow-sm transition-all relative ${
                       isMe 
-                        ? 'bg-[#129780] text-white rounded-tr-none' 
-                        : 'bg-white text-gray-600 border border-gray-100 rounded-tl-none'
-                    }`}>
+                        ? 'bg-[var(--accent)] text-white rounded-tr-none' 
+                        : 'bg-[var(--bg-secondary)] text-[var(--text-primary)] border border-[var(--border-color)] rounded-tl-none'
+                    } ${comment.userId === challengeWinnerId ? 'border-2 border-yellow-400' : ''}`}>
+                      
+                      {comment.userId === challengeWinnerId && (
+                        <div className="flex items-center gap-1.5 mb-2 bg-yellow-400/20 text-[var(--text-primary)] px-2 py-1 rounded-lg border border-yellow-400/30">
+                           <span className="text-xs">🏆</span>
+                           <span className="text-[10px] font-black uppercase tracking-tighter">CHAMPION</span>
+                        </div>
+                      )}
+
+                      {isChallenge && currentUser?.uid === authorId && !challengeWinnerId && comment.userId !== authorId && (
+                        <button 
+                          onClick={() => onSelectWinner(comment)}
+                          className="w-full mb-3 py-1.5 bg-yellow-400 hover:bg-yellow-500 text-[var(--text-primary)] font-black text-[10px] uppercase tracking-widest rounded-xl transition-all shadow-sm"
+                        >
+                          Select as Winner 🏅
+                        </button>
+                      )}
                       {comment.attachment && (
                         <div className="mb-3 rounded-xl overflow-hidden border border-gray-100/20 shadow-md">
                           {comment.attachment.type === 'image' ? (
@@ -446,13 +471,13 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
                     
                     <button 
                       onClick={() => handleReaction(comment.id, comment.likes)}
-                      className={`absolute -bottom-2 ${isMe ? '-left-2' : '-right-2'} flex items-center gap-1 bg-white border border-gray-100 rounded-full px-1.5 py-0.5 shadow-sm hover:scale-110 transition-transform active:scale-95`}
+                      className={`absolute -bottom-2 ${isMe ? '-left-2' : '-right-2'} flex items-center gap-1 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-full px-1.5 py-0.5 shadow-sm hover:scale-110 transition-transform active:scale-95`}
                     >
-                      <span className={`text-[10px] ${hasLiked ? 'text-red-500' : 'text-gray-400'}`}>
+                      <span className={`text-[10px] ${hasLiked ? 'text-red-500' : 'text-[var(--text-secondary)]'}`}>
                         {hasLiked ? '❤️' : '🤍'}
                       </span>
                       {comment.likes?.length > 0 && (
-                        <span className="text-[8px] font-bold text-gray-500">{comment.likes.length}</span>
+                        <span className="text-[8px] font-bold text-[var(--text-secondary)]">{comment.likes.length}</span>
                       )}
                     </button>
                   </div>
@@ -465,16 +490,16 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
 
       <div className="relative">
         {showMentions && filteredMentions.length > 0 && (
-          <div className="absolute bottom-full left-0 w-full mb-2 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-bottom-2">
-            <p className="bg-gray-50 px-4 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Mention someone</p>
+          <div className="absolute bottom-full left-0 w-full mb-2 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-bottom-2">
+            <p className="bg-[var(--bg-secondary)] px-4 py-2 text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Mention someone</p>
             <div className="max-h-48 overflow-y-auto">
               {filteredMentions.map(user => (
                 <button
                   key={user.uid}
                   onClick={() => insertMention(user)}
-                  className="w-full text-left px-4 py-3 text-sm hover:bg-[#f0f9f8] hover:text-[#129780] font-medium transition-colors flex items-center gap-3"
+                  className="w-full text-left px-4 py-3 text-sm hover:bg-[var(--accent)]/10 hover:text-[var(--accent)] font-medium transition-colors flex items-center gap-3 text-[var(--text-primary)]"
                 >
-                  <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-500">
+                  <div className="w-6 h-6 rounded-full bg-[var(--bg-secondary)] flex items-center justify-center text-[10px] font-bold text-[var(--text-secondary)] border border-[var(--border-color)]">
                     {user.name.charAt(0).toUpperCase()}
                   </div>
                   {user.name}
@@ -488,7 +513,7 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
         {attachment && (
           <div className="absolute bottom-full left-0 mb-4 animate-in slide-in-from-bottom-2 duration-300">
             <div className="relative inline-block group">
-              <div className="bg-white p-1 rounded-2xl shadow-xl border border-gray-100">
+              <div className="bg-[var(--bg-card)] p-1 rounded-2xl shadow-xl border border-[var(--border-color)]">
                 {attachment.type === 'image' ? (
                   <img src={attachment.url} className="w-20 h-20 object-cover rounded-xl" />
                 ) : (
@@ -508,13 +533,13 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
         {/* Upload Progress Bar */}
         {uploading && (
           <div className="absolute bottom-full left-0 w-full mb-4 px-4">
-             <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden shadow-sm">
+             <div className="w-full bg-[var(--bg-secondary)] h-1.5 rounded-full overflow-hidden shadow-sm">
                 <div 
-                  className="bg-[#129780] h-full transition-all duration-300" 
+                  className="bg-[var(--accent)] h-full transition-all duration-300" 
                   style={{ width: `${uploadProgress}%` }}
                 ></div>
              </div>
-             <p className="text-[10px] font-bold text-[#129780] mt-1 text-center uppercase tracking-widest">Uploading attachment...</p>
+             <p className="text-[10px] font-bold text-[var(--accent)] mt-1 text-center uppercase tracking-widest">Uploading attachment...</p>
           </div>
         )}
 
@@ -550,7 +575,7 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
               value={newComment}
               onChange={handleInputChange}
               placeholder="Type @ to mention, or coordinate..."
-              className="w-full bg-white border border-gray-200 rounded-[24px] pl-5 pr-14 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#129780]/20 focus:border-[#129780] min-h-[60px] max-h-[120px] resize-none shadow-sm transition-all group-focus-within:shadow-md"
+              className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[24px] pl-5 pr-14 py-4 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20 focus:border-[var(--accent)] min-h-[60px] max-h-[120px] resize-none shadow-sm transition-all group-focus-within:shadow-md"
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
@@ -562,7 +587,7 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
             <button 
               type="submit" 
               disabled={submitting || uploading || (!newComment.trim() && !attachment)}
-              className="absolute right-2 bottom-2 w-10 h-10 rounded-full bg-[#129780] hover:bg-[#0f806c] text-white flex items-center justify-center transition-all disabled:opacity-50 disabled:grayscale"
+              className="absolute right-2 bottom-2 w-10 h-10 rounded-full bg-[var(--accent)] hover:opacity-90 text-white flex items-center justify-center transition-all disabled:opacity-50 disabled:grayscale"
             >
               {submitting ? (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -575,21 +600,21 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
           {/* Action Buttons */}
           <div className="flex items-center gap-2 pl-2">
              <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileUpload} accept="image/*,video/*" />
-             <button 
-               type="button" 
-               onClick={() => fileInputRef.current.click()}
-               className="p-2 text-gray-400 hover:text-[#129780] hover:bg-[#f0f9f8] rounded-full transition-all"
-               title="Attach file"
-             >
-               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
-             </button>
-             <button 
-               type="button" 
-               onClick={startScreenRecording}
-               disabled={isRecording}
-               className={`p-2 rounded-full transition-all ${isRecording ? 'text-red-500 bg-red-50' : 'text-gray-400 hover:text-[#129780] hover:bg-[#f0f9f8]'}`}
-               title="Record Screen"
-             >
+              <button 
+                type="button" 
+                onClick={() => fileInputRef.current.click()}
+                className="p-2 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--accent)]/10 rounded-full transition-all"
+                title="Attach file"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+              </button>
+              <button 
+                type="button" 
+                onClick={startScreenRecording}
+                disabled={isRecording}
+                className={`p-2 rounded-full transition-all ${isRecording ? 'text-red-500 bg-red-50' : 'text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--accent)]/10'}`}
+                title="Record Screen"
+              >
                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
              </button>
              <VoiceNoteRecorder 

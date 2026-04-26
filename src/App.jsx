@@ -15,12 +15,22 @@ import { RequestDetailPage } from './pages/RequestDetailPage';
 import { OnboardingPage } from './pages/OnboardingPage';
 import { SessionsPage } from './pages/SessionsPage';
 import { LiveSessionPage } from './pages/LiveSessionPage';
+import { AdminPanel } from './pages/AdminPanel';
+import { RestrictedPage } from './pages/RestrictedPage';
+import { LeaderboardPage } from './pages/LeaderboardPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Toaster } from 'react-hot-toast';
 
 function PrivateRoute({ children }) {
-  const { currentUser } = useAuth();
-  return currentUser ? children : <Navigate to="/login" />;
+  const { currentUser, isAccountRestricted } = useAuth();
+  const restriction = isAccountRestricted();
+  
+  if (!currentUser) return <Navigate to="/login" />;
+  if (restriction && window.location.pathname !== '/restricted') {
+    return <Navigate to="/restricted" />;
+  }
+  
+  return children;
 }
 
 function App() {
@@ -77,15 +87,22 @@ function App() {
             <Route path="notifications" element={
               <PrivateRoute><NotificationsPage /></PrivateRoute>
             } />
+            <Route path="leaderboard" element={
+              <PrivateRoute><LeaderboardPage /></PrivateRoute>
+            } />
             <Route path="sessions" element={
               <PrivateRoute><SessionsPage /></PrivateRoute>
             } />
             <Route path="session/:sessionId" element={
               <PrivateRoute><LiveSessionPage /></PrivateRoute>
             } />
+            <Route path="admin" element={
+              <PrivateRoute><AdminPanel /></PrivateRoute>
+            } />
             <Route path="onboarding" element={
               <PrivateRoute><OnboardingPage /></PrivateRoute>
             } />
+            <Route path="restricted" element={<RestrictedPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

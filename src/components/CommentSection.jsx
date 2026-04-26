@@ -20,9 +20,13 @@ import { Card } from './ui/Card';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
 import { VoiceNoteRecorder } from './VoiceNoteRecorder';
+import { ReportModal } from './ReportModal';
 
 export function CommentSection({ postId, postTitle, authorId, authorName, helpers = [] }) {
-  const { currentUser, userData } = useAuth();
+  const { currentUser, userData, isAccountRestricted } = useAuth();
+  const [isReportOpen, setIsReportOpen] = useState(false);
+  const [reportedHelper, setReportedHelper] = useState(null);
+  const restriction = isAccountRestricted();
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(true);
@@ -402,6 +406,19 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
                 <div className={`flex flex-col max-w-[80%] ${isMe ? 'items-end' : ''}`}>
                   <div className="flex items-center gap-2 mb-1 px-1">
                     <span className="font-bold text-[#2b3231] text-[11px]">{isMe ? 'You' : comment.userName}</span>
+                    {!isMe && (
+                      <button 
+                        onClick={() => {
+                          setReportedHelper({ uid: comment.userId, name: comment.userName });
+                          setIsReportOpen(true);
+                        }}
+                        className="flex items-center gap-1 text-red-500 bg-red-50/50 hover:bg-red-500 hover:text-white px-2 py-0.5 rounded-full transition-all border border-red-100 group/report"
+                        title="Report User"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        <span className="text-[7px] font-bold uppercase tracking-tighter">Report</span>
+                      </button>
+                    )}
                     {isAuthor && (
                       <span className="bg-[#129780]/10 text-[#129780] text-[8px] font-bold px-1.5 py-0.5 rounded uppercase tracking-tighter">Author</span>
                     )}
@@ -515,7 +532,18 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="relative group flex flex-col gap-3">
+        {restriction ? (
+          <div className="bg-red-50 border border-red-100 rounded-[24px] p-6 text-center animate-in fade-in zoom-in-95 mb-4">
+            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-500 mx-auto mb-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            </div>
+            <p className="text-red-600 font-bold text-xs uppercase tracking-wider mb-1">Account {restriction}</p>
+            <p className="text-red-400 text-[10px] leading-relaxed max-w-[280px] mx-auto">
+              Your permissions have been limited due to report violations.
+            </p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="relative group flex flex-col gap-3">
           <div className="relative">
             <textarea
               ref={textareaRef}
@@ -570,7 +598,21 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
              />
           </div>
         </form>
+        )}
       </div>
+      {isReportOpen && (
+        <ReportModal 
+          isOpen={isReportOpen}
+          onClose={() => {
+            setIsReportOpen(false);
+            setReportedHelper(null);
+          }}
+          reportedUserId={reportedHelper?.uid}
+          reportedUserName={reportedHelper?.name}
+          reporterId={currentUser?.uid}
+          requestId={postId}
+        />
+      )}
     </Card>
   );
 }

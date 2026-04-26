@@ -166,9 +166,21 @@ export function ExplorePage() {
                   </div>
                 )}
                 <div className="flex items-center justify-between mt-auto">
-                  <div>
-                    <p className="font-bold text-sm text-[#2b3231]">{post.authorName || 'Anonymous'}</p>
-                    <p className="text-xs text-gray-500">{post.authorLocation || 'Unknown'} • {post.helpers?.length || 0} helpers interested</p>
+                  <div className="flex items-center gap-3">
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <p className="font-bold text-sm text-[#2b3231]">{post.authorName || 'Anonymous'}</p>
+                        {post.authorVerified && (
+                          <div className="text-[#129780] bg-[#129780]/10 p-0.5 rounded-full cursor-help group relative">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-[8px] rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
+                              Verified Expert in {post.authorVerifiedSkill}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-500">{post.authorLocation || 'Unknown'} • {post.helpers?.length || 0} helpers interested</p>
+                    </div>
                   </div>
                   <Button 
                     variant="outline" 

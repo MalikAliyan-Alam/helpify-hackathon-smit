@@ -5,10 +5,12 @@ import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { db } from '../lib/firebase';
 import { doc, onSnapshot, updateDoc, arrayUnion, addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { updateStreak } from '../lib/gamification.jsx';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
 import { CommentSection } from '../components/CommentSection';
 import { BookingModal } from '../components/BookingModal';
+import { EndorsementModal } from '../components/EndorsementModal';
 
 export function RequestDetailPage() {
   const { id } = useParams();
@@ -19,6 +21,7 @@ export function RequestDetailPage() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [isEndorsementOpen, setIsEndorsementOpen] = useState(false);
   const [selectedHelper, setSelectedHelper] = useState(null);
   const [forceShowComments, setForceShowComments] = useState(false);
 
@@ -74,6 +77,11 @@ export function RequestDetailPage() {
       }
 
       toast.success("Marked as solved!");
+      
+      // Open endorsement modal if there are helpers
+      if (post.helpers && post.helpers.length > 0) {
+        setIsEndorsementOpen(true);
+      }
     } catch (err) {
       console.error(err);
       toast.error("Failed to update status.");
@@ -122,6 +130,9 @@ export function RequestDetailPage() {
 
       toast.success("You are now listed as a helper!");
       setForceShowComments(true);
+      
+      // Update Streak & Check Badges
+      await updateStreak(currentUser.uid, userData);
     } catch (err) {
       console.error(err);
       toast.error("Failed to offer help.");
@@ -269,7 +280,17 @@ export function RequestDetailPage() {
                       {helper.name ? helper.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'H'}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-bold text-[#2b3231] text-sm truncate">{helper.name}</p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="font-bold text-[#2b3231] text-sm truncate">{helper.name}</p>
+                        {helper.verified && (
+                          <div className="text-[#129780] bg-[#129780]/10 p-0.5 rounded-full cursor-help group relative">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-[8px] rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
+                              Verified Expert in {helper.verifiedSkill}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                       <p className="text-xs text-gray-500 truncate mt-0.5">{helper.skills}</p>
                     </div>
                     <div className="flex flex-col items-end gap-2 shrink-0">
@@ -301,6 +322,16 @@ export function RequestDetailPage() {
           helper={selectedHelper}
           post={post}
           currentUser={currentUser}
+        />
+      )}
+
+      {isEndorsementOpen && (
+        <EndorsementModal 
+          isOpen={isEndorsementOpen}
+          onClose={() => setIsEndorsementOpen(false)}
+          helpers={post.helpers || []}
+          authorId={currentUser.uid}
+          authorName={userData?.name || currentUser.displayName}
         />
       )}
     </div>

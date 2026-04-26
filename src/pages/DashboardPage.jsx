@@ -8,6 +8,10 @@ import { collection, query, orderBy, limit, onSnapshot, where, doc, updateDoc } 
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
+import { LeaderboardWidget } from '../components/LeaderboardWidget';
+import { StreakWidget } from '../components/StreakWidget';
+import { updateStreak } from '../lib/gamification.jsx';
+
 export function DashboardPage() {
   const { currentUser, userData } = useAuth();
   const navigate = useNavigate();
@@ -100,6 +104,12 @@ export function DashboardPage() {
 
     return () => unsubscribe();
   }, [currentUser]);
+
+  useEffect(() => {
+    if (currentUser && userData) {
+      updateStreak(currentUser.uid, userData);
+    }
+  }, [currentUser, userData?.uid]);
   
   // Dynamic Calculations
   const helpingCount = allPosts.filter(p => p.helpers?.some(h => h.uid === currentUser?.uid)).length;
@@ -358,6 +368,16 @@ export function DashboardPage() {
               </div>
             </div>
           </Card>
+          
+          {/* Streak Widget */}
+          <StreakWidget 
+            currentStreak={userData?.currentStreak || 0} 
+            longestStreak={userData?.longestStreak || 0} 
+            freezes={userData?.streakFreezes || 0} 
+          />
+
+          {/* Leaderboard Widget */}
+          <LeaderboardWidget />
 
           {/* Notifications */}
           <Card className="bg-[#fdfcf9] border-none shadow-sm rounded-[24px] p-8">

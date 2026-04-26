@@ -122,13 +122,29 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
+  function logout() {
+    return signOut(auth);
+  }
+
+  function isAccountRestricted() {
+    if (!userData) return false;
+    if (userData.accountStatus === 'banned') return 'banned';
+    if (userData.accountStatus === 'suspended') {
+      const now = new Date();
+      const suspendedUntil = userData.suspendedUntil?.toDate ? userData.suspendedUntil.toDate() : new Date(0);
+      if (now < suspendedUntil) return 'suspended';
+    }
+    return false;
+  }
+
   const value = {
     currentUser,
     userData,
     signup,
     login,
     signInWithGoogle,
-    logout
+    logout,
+    isAccountRestricted
   };
 
   return (

@@ -161,6 +161,19 @@ export function RequestDetailPage() {
         <p className="text-gray-300 text-lg leading-relaxed max-w-3xl">
           {post.description}
         </p>
+
+        {post.attachment && (
+          <div className="mt-8 rounded-[24px] overflow-hidden max-w-2xl border border-white/10 shadow-2xl animate-in fade-in zoom-in duration-500">
+            {post.attachment.type === 'image' ? (
+              <img src={post.attachment.url} alt="Attachment" className="w-full object-cover" />
+            ) : (
+              <video src={post.attachment.url} controls className="w-full" />
+            )}
+            <div className="bg-black/20 backdrop-blur-md px-6 py-3 text-xs font-bold uppercase tracking-widest text-white/60">
+              Attached Reference: {post.attachment.name}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 items-start">

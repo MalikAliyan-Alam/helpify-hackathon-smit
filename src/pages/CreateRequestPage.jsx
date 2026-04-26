@@ -6,6 +6,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { FileUploader } from '../components/FileUploader';
 
 export function CreateRequestPage() {
   const [title, setTitle] = useState('');
@@ -13,6 +14,7 @@ export function CreateRequestPage() {
   const [tags, setTags] = useState('');
   const [category, setCategory] = useState('Web Development');
   const [urgency, setUrgency] = useState('High');
+  const [attachment, setAttachment] = useState(null);
   const [loading, setLoading] = useState(false);
   
   const { currentUser, userData } = useAuth();
@@ -37,6 +39,7 @@ export function CreateRequestPage() {
         userId: currentUser.uid,
         authorName: userData?.name || currentUser.displayName || currentUser.email || 'Anonymous',
         authorLocation: userData?.location || 'Unknown',
+        attachment,
         createdAt: serverTimestamp(),
       };
 
@@ -94,6 +97,11 @@ export function CreateRequestPage() {
                 placeholder="Explain the challenge, your current progress, deadline, and what kind of help would be useful." 
                 className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#129780] resize-none"
               ></textarea>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-4">Attach Reference (Optional)</label>
+              <FileUploader onUploadComplete={(data) => setAttachment(data)} />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

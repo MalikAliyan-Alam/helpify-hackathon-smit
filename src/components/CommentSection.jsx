@@ -1,5 +1,3 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { db } from '../lib/firebase';
 import { 
   collection, 
   addDoc, 
@@ -13,6 +11,8 @@ import {
   arrayUnion,
   arrayRemove
 } from 'firebase/firestore';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { storage } from '../lib/firebase';
 import { Button } from './ui/Button';
 import { Card } from './ui/Card';
 import { useAuth } from '../contexts/AuthContext';
@@ -25,6 +25,15 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   
+  // Attachments & Recording State
+  const [attachment, setAttachment] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploading, setUploading] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const mediaRecorderRef = useRef(null);
+  const recordingIntervalRef = useRef(null);
+  
   // Mentions State
   const [showMentions, setShowMentions] = useState(false);
   const [mentionQuery, setMentionQuery] = useState('');
@@ -32,6 +41,7 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
   
   const scrollRef = useRef(null);
   const textareaRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   // Available users for mentions (Author + Helpers)
   const mentionableUsers = [
@@ -76,6 +86,84 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
     return () => unsubscribe();
   }, [postId]);
 
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      uploadFile(file);
+    }
+  };
+
+  const uploadFile = (file) => {
+    const storageRef = ref(storage, `chat/${postId}/${Date.now()}_${file.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    setUploading(true);
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {
+        setUploadProgress((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+      },
+      (error) => {
+        console.error('Upload failed:', error);
+        toast.error('Failed to upload file');
+        setUploading(false);
+      },
+      async () => {
+        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+        setAttachment({
+          url: downloadURL,
+          type: file.type.startsWith('image/') ? 'image' : 'video',
+          name: file.name
+        });
+        setUploading(false);
+        setUploadProgress(0);
+        toast.success('File attached');
+      }
+    );
+  };
+
+  const startScreenRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getDisplayMedia({
+        video: { cursor: 'always' },
+        audio: false
+      });
+
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      const chunks = [];
+
+      mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+      mediaRecorder.onstop = async () => {
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        const file = new File([blob], `screen_record_${Date.now()}.webm`, { type: 'video/webm' });
+        uploadFile(file);
+        stream.getTracks().forEach(track => track.stop());
+        setIsRecording(false);
+        clearInterval(recordingIntervalRef.current);
+        setRecordingTime(0);
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+      
+      // Timer & Auto-stop at 30s
+      let timeLeft = 30;
+      setRecordingTime(timeLeft);
+      recordingIntervalRef.current = setInterval(() => {
+        timeLeft -= 1;
+        setRecordingTime(timeLeft);
+        if (timeLeft <= 0) {
+          mediaRecorder.stop();
+        }
+      }, 1000);
+
+    } catch (err) {
+      console.error('Recording error:', err);
+      toast.error('Failed to start recording');
+    }
+  };
+
   const handleInputChange = (e) => {
     const value = e.target.value;
     const selectionStart = e.target.selectionStart;
@@ -109,7 +197,7 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
   const handleSubmit = async (e) => {
     e.preventDefault();
     const commentText = newComment.trim();
-    if (!commentText) return;
+    if (!commentText && !attachment) return;
     if (!currentUser) {
       toast.error("Please login to comment");
       return;
@@ -124,14 +212,16 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
         userId: currentUser.uid,
         userName,
         content: commentText,
+        attachment,
         createdAt: serverTimestamp(),
         likes: []
       });
 
       setNewComment('');
+      setAttachment(null);
       toast.success("Message sent!");
 
-      // 2. Notify post author
+      // Notify post author
       if (authorId && authorId !== currentUser.uid) {
         try {
           await addDoc(collection(db, 'notifications'), {
@@ -146,13 +236,12 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
         }
       }
 
-      // 3. Notify mentioned users
+      // Notify mentioned users
       const mentions = commentText.match(/@(\w+(?:\s\w+)?)/g);
       if (mentions) {
         const uniqueMentionedNames = [...new Set(mentions.map(m => m.substring(1)))];
         for (const mentionedName of uniqueMentionedNames) {
           const targetUser = mentionableUsers.find(u => u.name === mentionedName);
-          // Don't notify if it's the current user or already notified as author
           if (targetUser && targetUser.uid !== currentUser.uid && targetUser.uid !== authorId) {
             try {
               await addDoc(collection(db, 'notifications'), {
@@ -256,6 +345,15 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
                         ? 'bg-[#129780] text-white rounded-tr-none' 
                         : 'bg-white text-gray-600 border border-gray-100 rounded-tl-none'
                     }`}>
+                      {comment.attachment && (
+                        <div className="mb-3 rounded-xl overflow-hidden border border-gray-100/20 shadow-md">
+                          {comment.attachment.type === 'image' ? (
+                            <img src={comment.attachment.url} alt="Shared" className="w-full object-cover max-h-48 cursor-pointer hover:opacity-90 transition-opacity" onClick={() => window.open(comment.attachment.url, '_blank')} />
+                          ) : (
+                            <video src={comment.attachment.url} controls className="w-full max-h-48 bg-black" />
+                          )}
+                        </div>
+                      )}
                       {renderContent(comment.content)}
                     </div>
                     
@@ -298,32 +396,105 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
             </div>
           </div>
         )}
-        <form onSubmit={handleSubmit} className="relative group">
-          <textarea
-            ref={textareaRef}
-            value={newComment}
-            onChange={handleInputChange}
-            placeholder="Type @ to mention, or coordinate..."
-            className="w-full bg-white border border-gray-200 rounded-[24px] pl-5 pr-14 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#129780]/20 focus:border-[#129780] min-h-[60px] max-h-[120px] resize-none shadow-sm transition-all group-focus-within:shadow-md"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmit(e);
-              }
-              if (e.key === 'Escape') setShowMentions(false);
-            }}
-          />
-          <button 
-            type="submit" 
-            disabled={submitting || !newComment.trim()}
-            className="absolute right-2 bottom-2 w-10 h-10 rounded-full bg-[#129780] hover:bg-[#0f806c] text-white flex items-center justify-center transition-all disabled:opacity-50 disabled:grayscale"
-          >
-            {submitting ? (
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-            )}
-          </button>
+        
+        {/* Attachment Preview */}
+        {attachment && (
+          <div className="absolute bottom-full left-0 mb-4 animate-in slide-in-from-bottom-2 duration-300">
+            <div className="relative inline-block group">
+              <div className="bg-white p-1 rounded-2xl shadow-xl border border-gray-100">
+                {attachment.type === 'image' ? (
+                  <img src={attachment.url} className="w-20 h-20 object-cover rounded-xl" />
+                ) : (
+                  <div className="w-20 h-20 bg-black rounded-xl flex items-center justify-center text-white text-[10px] font-bold">VIDEO</div>
+                )}
+              </div>
+              <button 
+                onClick={() => setAttachment(null)}
+                className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-red-600 transition-colors"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Upload Progress Bar */}
+        {uploading && (
+          <div className="absolute bottom-full left-0 w-full mb-4 px-4">
+             <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden shadow-sm">
+                <div 
+                  className="bg-[#129780] h-full transition-all duration-300" 
+                  style={{ width: `${uploadProgress}%` }}
+                ></div>
+             </div>
+             <p className="text-[10px] font-bold text-[#129780] mt-1 text-center uppercase tracking-widest">Uploading attachment...</p>
+          </div>
+        )}
+
+        {/* Screen Recording UI */}
+        {isRecording && (
+          <div className="absolute bottom-full right-0 mb-4 flex items-center gap-3 bg-red-500 text-white px-4 py-2 rounded-full shadow-lg animate-pulse">
+            <div className="w-2 h-2 rounded-full bg-white"></div>
+            <span className="text-xs font-bold uppercase tracking-widest">Recording Screen: {recordingTime}s</span>
+            <button 
+              onClick={() => mediaRecorderRef.current?.stop()}
+              className="ml-2 bg-white text-red-500 text-[10px] font-bold px-3 py-1 rounded-full hover:bg-gray-100"
+            >
+              STOP
+            </button>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="relative group flex flex-col gap-3">
+          <div className="relative">
+            <textarea
+              ref={textareaRef}
+              value={newComment}
+              onChange={handleInputChange}
+              placeholder="Type @ to mention, or coordinate..."
+              className="w-full bg-white border border-gray-200 rounded-[24px] pl-5 pr-14 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#129780]/20 focus:border-[#129780] min-h-[60px] max-h-[120px] resize-none shadow-sm transition-all group-focus-within:shadow-md"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubmit(e);
+                }
+                if (e.key === 'Escape') setShowMentions(false);
+              }}
+            />
+            <button 
+              type="submit" 
+              disabled={submitting || uploading || (!newComment.trim() && !attachment)}
+              className="absolute right-2 bottom-2 w-10 h-10 rounded-full bg-[#129780] hover:bg-[#0f806c] text-white flex items-center justify-center transition-all disabled:opacity-50 disabled:grayscale"
+            >
+              {submitting ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+              )}
+            </button>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2 pl-2">
+             <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileUpload} accept="image/*,video/*" />
+             <button 
+               type="button" 
+               onClick={() => fileInputRef.current.click()}
+               className="p-2 text-gray-400 hover:text-[#129780] hover:bg-[#f0f9f8] rounded-full transition-all"
+               title="Attach file"
+             >
+               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+             </button>
+             <button 
+               type="button" 
+               onClick={startScreenRecording}
+               disabled={isRecording}
+               className={`p-2 rounded-full transition-all ${isRecording ? 'text-red-500 bg-red-50' : 'text-gray-400 hover:text-[#129780] hover:bg-[#f0f9f8]'}`}
+               title="Record Screen"
+             >
+               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+             </button>
+          </div>
         </form>
       </div>
     </Card>

@@ -1,6 +1,4 @@
 import React, { useState, useRef } from 'react';
-import { storage } from '../lib/firebase';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { Badge } from './ui/Badge';
 
 export function FileUploader({ onUploadComplete, initialFile = null }) {
@@ -10,6 +8,10 @@ export function FileUploader({ onUploadComplete, initialFile = null }) {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
 
+  // Replace these with your Cloudinary credentials
+  const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'YOUR_CLOUD_NAME';
+  const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'YOUR_UPLOAD_PRESET';
+
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
@@ -18,18 +20,12 @@ export function FileUploader({ onUploadComplete, initialFile = null }) {
   };
 
   const processFile = (selectedFile) => {
-    // Check file type
     const isImage = selectedFile.type.startsWith('image/');
     const isVideo = selectedFile.type.startsWith('video/');
     
     if (!isImage && !isVideo) {
       alert('Please upload an image (PNG, JPG) or a video (MP4, WebM).');
       return;
-    }
-
-    // Check video duration (approximate by size or metadata if possible, but 30s is tricky without loading)
-    if (isVideo && selectedFile.size > 50 * 1024 * 1024) { // 50MB limit as a proxy
-      alert('Video file is too large. Please keep it under 30 seconds.');
     }
 
     setFile(selectedFile);
@@ -39,35 +35,55 @@ export function FileUploader({ onUploadComplete, initialFile = null }) {
     };
     reader.readAsDataURL(selectedFile);
 
-    // Auto upload
-    uploadFile(selectedFile);
+    // Auto upload to Cloudinary
+    uploadToCloudinary(selectedFile);
   };
 
-  const uploadFile = (fileToUpload) => {
-    const storageRef = ref(storage, `uploads/${Date.now()}_${fileToUpload.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, fileToUpload);
+  const uploadToCloudinary = async (fileToUpload) => {
+    if (CLOUD_NAME === 'YOUR_CLOUD_NAME' || UPLOAD_PRESET === 'YOUR_UPLOAD_PRESET') {
+      alert('Cloudinary credentials missing. Check your .env file and restart server.');
+      return;
+    }
 
-    setUploading(true);
-    uploadTask.on(
-      'state_changed',
-      (snapshot) => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        setUploadProgress(progress);
-      },
-      (error) => {
-        console.error('Upload failed:', error);
-        setUploading(false);
-      },
-      async () => {
-        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-        setUploading(false);
-        onUploadComplete({
-          url: downloadURL,
-          type: fileToUpload.type.startsWith('image/') ? 'image' : 'video',
-          name: fileToUpload.name
-        });
-      }
-    );
+    const formData = new FormData();
+    formData.append('file', fileToUpload);
+    formData.append('upload_preset', UPLOAD_PRESET);
+
+    try {
+      setUploading(true);
+      
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, true);
+
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+          const progress = (e.loaded / e.total) * 100;
+          setUploadProgress(progress);
+        }
+      };
+
+      xhr.onload = () => {
+        const response = JSON.parse(xhr.responseText);
+        if (xhr.status === 200) {
+          setUploading(false);
+          onUploadComplete({
+            url: response.secure_url,
+            type: fileToUpload.type.startsWith('image/') ? 'image' : 'video',
+            name: fileToUpload.name
+          });
+        } else {
+          console.error('Cloudinary Error Detail:', response);
+          setUploading(false);
+          alert(`Upload failed: ${response.error?.message || 'Check Cloudinary settings'}`);
+        }
+      };
+
+      xhr.send(formData);
+
+    } catch (error) {
+      console.error('Cloudinary Request Error:', error);
+      setUploading(false);
+    }
   };
 
   const handleDragOver = (e) => {

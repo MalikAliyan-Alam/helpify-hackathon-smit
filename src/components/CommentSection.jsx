@@ -1,3 +1,5 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { db } from '../lib/firebase';
 import { 
   collection, 
   addDoc, 
@@ -42,6 +44,10 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
   const scrollRef = useRef(null);
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
+
+  // Cloudinary Config
+  const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'YOUR_CLOUD_NAME';
+  const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'YOUR_UPLOAD_PRESET';
 
   // Available users for mentions (Author + Helpers)
   const mentionableUsers = [
@@ -93,33 +99,52 @@ export function CommentSection({ postId, postTitle, authorId, authorName, helper
     }
   };
 
-  const uploadFile = (file) => {
-    const storageRef = ref(storage, `chat/${postId}/${Date.now()}_${file.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, file);
+  const uploadFile = async (file) => {
+    if (CLOUD_NAME === 'YOUR_CLOUD_NAME' || UPLOAD_PRESET === 'YOUR_UPLOAD_PRESET') {
+      toast.error('Cloudinary credentials missing. Check your .env file and restart server.');
+      return;
+    }
 
-    setUploading(true);
-    uploadTask.on(
-      'state_changed',
-      (snapshot) => {
-        setUploadProgress((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-      },
-      (error) => {
-        console.error('Upload failed:', error);
-        toast.error('Failed to upload file');
-        setUploading(false);
-      },
-      async () => {
-        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-        setAttachment({
-          url: downloadURL,
-          type: file.type.startsWith('image/') ? 'image' : 'video',
-          name: file.name
-        });
-        setUploading(false);
-        setUploadProgress(0);
-        toast.success('File attached');
-      }
-    );
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', UPLOAD_PRESET);
+
+    try {
+      setUploading(true);
+      
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, true);
+
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+          setUploadProgress((e.loaded / e.total) * 100);
+        }
+      };
+
+      xhr.onload = () => {
+        const response = JSON.parse(xhr.responseText);
+        if (xhr.status === 200) {
+          setAttachment({
+            url: response.secure_url,
+            type: file.type.startsWith('image/') ? 'image' : 'video',
+            name: file.name
+          });
+          setUploading(false);
+          setUploadProgress(0);
+          toast.success('File attached');
+        } else {
+          console.error('Cloudinary Error Detail:', response);
+          setUploading(false);
+          toast.error(`Upload failed: ${response.error?.message || 'Check Cloudinary settings'}`);
+        }
+      };
+
+      xhr.send(formData);
+
+    } catch (error) {
+      console.error('Cloudinary Request Error:', error);
+      setUploading(false);
+    }
   };
 
   const startScreenRecording = async () => {

@@ -57,50 +57,50 @@ export function NotificationsPage() {
   return (
     <div className="flex flex-col gap-8 pb-12">
       {/* Header */}
-      <div className="bg-[#2b3231] rounded-[24px] p-10 flex flex-col text-white">
-        <p className="text-gray-400 font-bold text-xs uppercase tracking-wider mb-4">NOTIFICATIONS</p>
+      <div className="bg-[var(--hero-bg)] rounded-[24px] p-10 flex flex-col text-[var(--hero-text)]">
+        <p className="opacity-60 font-bold text-xs uppercase tracking-wider mb-4">NOTIFICATIONS</p>
         <h1 className="text-4xl lg:text-[56px] font-bold tracking-tight mb-4 max-w-3xl leading-[1.1]">
           Stay updated on requests, helpers, and trust signals.
         </h1>
-        <p className="text-gray-300 text-lg">
+        <p className="opacity-80 text-lg">
           Track new matches, solved items, AI insights, and reputation changes in one place.
         </p>
       </div>
 
-      <Card className="bg-[#fdfcf9] border-none shadow-sm rounded-[24px] p-6 lg:p-10">
-        <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-2">LIVE UPDATES</p>
-        <h3 className="text-3xl font-bold text-[#2b3231] mb-8">Notification feed</h3>
+      <Card className="border-none shadow-sm rounded-[24px] p-6 lg:p-10">
+        <p className="text-[var(--accent)] font-bold text-[10px] uppercase tracking-wider mb-2">LIVE UPDATES</p>
+        <h3 className="text-3xl font-bold text-[var(--text-primary)] mb-8">Notification feed</h3>
 
         <div className="space-y-4">
           {loading ? (
             <div className="text-center py-12 text-gray-500 font-medium">Loading notifications...</div>
           ) : notifications.length > 0 ? (
             notifications.map((notif) => (
-              <div key={notif.id} className={`bg-white border ${notif.read ? 'border-gray-100 opacity-70' : 'border-[#129780]/30'} rounded-[20px] p-6 flex items-center justify-between gap-4`}>
+              <div key={notif.id} className={`bg-[var(--bg-card)] border ${notif.read ? 'border-[var(--border-color)] opacity-60' : 'border-[var(--accent)]/30'} rounded-[20px] p-6 flex items-center justify-between gap-4`}>
                 <div>
-                  <p className="text-[17px] font-bold text-[#2b3231] leading-snug mb-2">{notif.message}</p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-[17px] font-bold text-[var(--text-primary)] leading-snug mb-2">{notif.message}</p>
+                  <p className="text-sm text-[var(--text-secondary)]">
                     {notif.type} • {notif.createdAt?.toDate ? formatDistanceToNow(notif.createdAt.toDate(), { addSuffix: true }) : 'Just now'}
                   </p>
                 </div>
                 <Button 
                   variant="outline" 
                   onClick={() => handleToggleRead(notif.id, notif.read)}
-                  className={`rounded-full px-6 py-2 shadow-sm font-semibold border-gray-200 ${notif.read ? 'text-gray-600 bg-white hover:bg-gray-50' : 'text-[#2b3231] bg-white hover:bg-gray-50'}`}
+                  className={`rounded-full px-6 py-2 shadow-sm font-semibold border-[var(--border-color)] ${notif.read ? 'text-[var(--text-secondary)] bg-[var(--bg-card)]' : 'text-[var(--text-primary)] bg-[var(--bg-card)]'}`}
                 >
                   {notif.read ? 'Read' : 'Unread'}
                 </Button>
               </div>
             ))
           ) : (
-            <div className="bg-white border border-gray-100 rounded-[20px] p-12 text-center">
-              <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[20px] p-12 text-center">
+              <div className="w-16 h-16 bg-[var(--bg-card)] rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-[var(--text-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
               </div>
-              <p className="text-lg font-bold text-[#2b3231] mb-2">You're all caught up!</p>
-              <p className="text-gray-500 text-sm">When there's activity on your requests or profile, it will show up here.</p>
+              <p className="text-lg font-bold text-[var(--text-primary)] mb-2">You're all caught up!</p>
+              <p className="text-[var(--text-secondary)] text-sm">When there's activity on your requests or profile, it will show up here.</p>
             </div>
           )}
         </div>

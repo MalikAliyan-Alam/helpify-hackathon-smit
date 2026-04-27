@@ -105,35 +105,35 @@ export function BookingModal({ isOpen, onClose, helper, post, currentUser }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="w-full max-w-lg bg-[#fdfcf9] rounded-t-[32px] sm:rounded-[32px] overflow-hidden shadow-2xl animate-in slide-in-from-bottom-8 duration-500">
+    <div className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
+      <div className="w-full max-w-lg bg-[var(--bg-card)] sm:bg-[var(--glass-bg)] sm:backdrop-blur-2xl border border-[var(--glass-border)] rounded-t-[32px] sm:rounded-[32px] overflow-hidden shadow-2xl animate-in slide-in-from-bottom-8 duration-500">
         <div className="p-8">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-1">SCHEDULING</p>
-              <h3 className="text-2xl font-bold text-[#2b3231]">Book with {helper.name}</h3>
+              <p className="text-[var(--accent)] font-black text-[10px] uppercase tracking-[0.2em] mb-1">SCHEDULING</p>
+              <h3 className="text-2xl font-black text-[var(--text-primary)] tracking-tight">Book with {helper.name}</h3>
             </div>
-            <button onClick={onClose} className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors">×</button>
+            <button onClick={onClose} className="w-10 h-10 rounded-full bg-[var(--bg-secondary)] flex items-center justify-center text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/80 transition-colors">×</button>
           </div>
 
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-bold text-[#2b3231] mb-3">Select Date</label>
+              <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em] mb-3 opacity-60">Select Date</label>
               <input 
                 type="date" 
                 min={new Date().toISOString().split('T')[0]}
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#129780]"
+                className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition-all"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-[#2b3231] mb-3">Available Slots</label>
+              <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em] mb-3 opacity-60">Available Slots</label>
               <div className="flex flex-wrap gap-2">
                 {!fullHelper ? (
                   <div className="w-full flex justify-center py-4">
-                    <div className="w-5 h-5 border-2 border-[#129780] border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-5 h-5 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin"></div>
                   </div>
                 ) : fullHelper.availability?.slots?.length > 0 ? (
                   fullHelper.availability.slots.map((slot, idx) => {
@@ -143,12 +143,12 @@ export function BookingModal({ isOpen, onClose, helper, post, currentUser }) {
                         key={idx}
                         disabled={booked}
                         onClick={() => setSelectedSlot(slot)}
-                        className={`px-4 py-2 rounded-full text-xs font-bold transition-all border ${
+                        className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-wider transition-all border ${
                           booked 
-                            ? 'bg-gray-100 text-gray-300 border-gray-100 cursor-not-allowed'
+                            ? 'bg-[var(--bg-secondary)] text-[var(--text-secondary)] border-[var(--border-color)] opacity-40 cursor-not-allowed'
                             : selectedSlot === slot
-                              ? 'bg-[#129780] text-white border-[#129780]'
-                              : 'bg-white text-[#129780] border-[#129780]/20 hover:bg-[#f0f9f8]'
+                              ? 'bg-[var(--accent)] text-white border-[var(--accent)] shadow-lg shadow-[var(--accent)]/20'
+                              : 'bg-[var(--bg-secondary)] text-[var(--text-primary)] border-[var(--border-color)] hover:border-[var(--accent)]'
                         }`}
                       >
                         {slot} {booked && '(Booked)'}
@@ -156,27 +156,27 @@ export function BookingModal({ isOpen, onClose, helper, post, currentUser }) {
                     );
                   })
                 ) : (
-                  <div className="w-full bg-amber-50 border border-amber-100 rounded-2xl p-4 text-center">
-                    <p className="text-sm text-amber-700 font-medium italic">
-                      This helper hasn't set up their specific time slots yet. 
+                  <div className="w-full bg-orange-500/5 border border-orange-500/10 rounded-2xl p-6 text-center">
+                    <p className="text-sm text-orange-500 font-bold mb-1">
+                      No slots configured
                     </p>
-                    <p className="text-[10px] text-amber-600 mt-1 uppercase tracking-widest font-bold">
-                      Tip: You can set yours in Profile &gt; Scheduling
+                    <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest font-bold opacity-60">
+                      The helper hasn't set their availability yet.
                     </p>
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="pt-4 border-t border-gray-100">
+            <div className="pt-6 border-t border-[var(--border-color)]">
               <Button 
                 onClick={handleBooking} 
                 disabled={loading || !selectedDate || !selectedSlot}
-                className="w-full rounded-full py-4 font-bold shadow-lg"
+                className="w-full rounded-full py-4 font-black bg-[var(--accent)] shadow-lg shadow-[var(--accent)]/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
               >
                 {loading ? 'Processing...' : 'Confirm Booking'}
               </Button>
-              <p className="text-center text-[10px] text-gray-400 mt-4 uppercase tracking-widest font-bold">
+              <p className="text-center text-[9px] text-[var(--text-secondary)] mt-6 uppercase tracking-[0.2em] font-black opacity-40">
                 Cancellations must be made 2 hours in advance
               </p>
             </div>

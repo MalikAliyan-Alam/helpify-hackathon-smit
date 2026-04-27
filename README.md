@@ -1,4 +1,4 @@
-# 🤝 Helplytics — Community Support Platform
+# 🤝 Helplystack — Community Support Platform
 
 > **SMIT Grand Coding Night · April 2026**  
 > *"Writing code is not enough. Building a product is what truly matters."*
@@ -24,7 +24,7 @@
 
 ## 🌐 Overview
 
-**Helplytics** is a multi-page, community-driven support platform built to bridge the gap between people who **need help** and those who **can provide it**. Whether it's a coding question, a learning roadblock, or a skill-based challenge — Helplytics makes collaboration fast, structured, and rewarding.
+**Helplystack** is a multi-page, community-driven support platform built to bridge the gap between people who **need help** and those who **can provide it**. Whether it's a coding question, a learning roadblock, or a skill-based challenge — Helplystack makes collaboration fast, structured, and rewarding.
 
 ---
 
@@ -38,7 +38,7 @@ In today's learning ecosystem, a critical gap exists:
 
 This results in slower learning, missed opportunities, and weak community collaboration.
 
-**Helplytics** solves this by providing a structured and community-driven platform for meaningful peer support.
+**Helplystack** solves this by providing a structured and community-driven platform for meaningful peer support.
 
 ---
 
@@ -106,10 +106,10 @@ This results in slower learning, missed opportunities, and weak community collab
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/helplytics.git
+git clone https://github.com/your-username/helplystack.git
 
 # Navigate into the project
-cd helplytics
+cd helplystack
 
 # Install dependencies
 npm install
@@ -147,7 +147,7 @@ npm run build
 ## 🗂️ Project Structure
 
 ```
-helplytics/
+helplystack/
 │
 ├── public/
 │
@@ -208,7 +208,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 <div align="center">
 
-**Helplytics** — *Connecting learners. Empowering helpers. Building community.*
+**Helplystack** — *Connecting learners. Empowering helpers. Building community.*
 
 ⭐ Star this repo if you find it useful!
 

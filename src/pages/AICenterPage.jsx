@@ -77,10 +77,10 @@ export function AICenterPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Metric 1 */}
-        <Card className="bg-white border-none shadow-sm rounded-[24px] p-8 flex flex-col justify-between">
+        <Card className="bg-[var(--bg-card)] border-none shadow-sm rounded-[24px] p-8 flex flex-col justify-between">
           <div>
-            <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-4">TREND PULSE</p>
-            <h3 className="text-3xl font-bold text-[#2b3231] leading-tight mb-6">
+            <p className="text-[var(--accent)] font-bold text-[10px] uppercase tracking-wider mb-4">TREND PULSE</p>
+            <h3 className="text-3xl font-bold text-[var(--text-primary)] leading-tight mb-6">
               {mostRequestedCategory.split(' ').map((word, i) => (
                 <React.Fragment key={i}>
                   {word}<br/>
@@ -88,42 +88,42 @@ export function AICenterPage() {
               ))}
             </h3>
           </div>
-          <p className="text-gray-600 text-sm leading-relaxed">
+          <p className="text-[var(--text-secondary)] text-sm leading-relaxed">
             Most common support area based on active community requests.
           </p>
         </Card>
 
         {/* Metric 2 */}
-        <Card className="bg-white border-none shadow-sm rounded-[24px] p-8 flex flex-col justify-between">
+        <Card className="bg-[var(--bg-card)] border-none shadow-sm rounded-[24px] p-8 flex flex-col justify-between">
           <div>
-            <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-4">URGENCY WATCH</p>
-            <h3 className="text-4xl font-bold text-[#2b3231] mb-6">{highUrgencyCount}</h3>
+            <p className="text-[var(--accent)] font-bold text-[10px] uppercase tracking-wider mb-4">URGENCY WATCH</p>
+            <h3 className="text-4xl font-bold text-[var(--text-primary)] mb-6">{highUrgencyCount}</h3>
           </div>
-          <p className="text-gray-600 text-sm leading-relaxed">
+          <p className="text-[var(--text-secondary)] text-sm leading-relaxed">
             Requests currently flagged high priority by the urgency detector.
           </p>
         </Card>
 
         {/* Metric 3 */}
-        <Card className="bg-white border-none shadow-sm rounded-[24px] p-8 flex flex-col justify-between">
+        <Card className="bg-[var(--bg-card)] border-none shadow-sm rounded-[24px] p-8 flex flex-col justify-between">
           <div>
-            <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-4">MENTOR POOL</p>
-            <h3 className="text-4xl font-bold text-[#2b3231] mb-6">{mentorCount}</h3>
+            <p className="text-[var(--accent)] font-bold text-[10px] uppercase tracking-wider mb-4">MENTOR POOL</p>
+            <h3 className="text-4xl font-bold text-[var(--text-primary)] mb-6">{mentorCount}</h3>
           </div>
-          <p className="text-gray-600 text-sm leading-relaxed">
+          <p className="text-[var(--text-secondary)] text-sm leading-relaxed">
             Trusted helpers with strong response history and contribution signals.
           </p>
         </Card>
       </div>
 
       {/* AI Recommendations */}
-      <Card className="bg-[#fdfcf9] border-none shadow-sm rounded-[24px] p-8 lg:p-10 mt-2">
-        <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-2">AI RECOMMENDATIONS</p>
-        <h3 className="text-3xl font-bold text-[#2b3231] mb-8">Requests needing attention</h3>
+      <Card className="bg-[var(--bg-card)] border-none shadow-sm rounded-[24px] p-8 lg:p-10 mt-2">
+        <p className="text-[var(--accent)] font-bold text-[10px] uppercase tracking-wider mb-2">AI RECOMMENDATIONS</p>
+        <h3 className="text-3xl font-bold text-[var(--text-primary)] mb-8">Requests needing attention</h3>
 
         <div className="space-y-4">
           {loading ? (
-            <div className="text-center py-12 text-gray-500 font-medium">Analyzing community feed...</div>
+            <div className="text-center py-12 text-[var(--text-secondary)] font-medium">Analyzing community feed...</div>
           ) : openPosts.length > 0 ? (
             openPosts.map((post) => {
               const aiSummary = `AI signals indicate this is a ${post.category || 'General'} request with ${post.urgency?.toLowerCase() || 'normal'} urgency. Best suited for members with ${post.tags?.[0]?.toLowerCase() || 'relevant'} expertise to resolve quickly.`;
@@ -131,15 +131,15 @@ export function AICenterPage() {
                 <div 
                   key={post.id} 
                   onClick={() => navigate(`/request/${post.id}`)}
-                  className="bg-white border border-gray-100 rounded-[20px] p-6 lg:p-8 cursor-pointer hover:border-[#129780]/30 transition-colors"
+                  className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[20px] p-6 lg:p-8 cursor-pointer hover:border-[var(--accent)]/30 transition-colors"
                 >
-                  <h4 className="font-bold text-[17px] leading-snug mb-3">{post.title}</h4>
-                  <p className="text-gray-600 text-[15px] leading-relaxed mb-6 max-w-4xl">
+                  <h4 className="font-bold text-[17px] leading-snug mb-3 text-[var(--text-primary)]">{post.title}</h4>
+                  <p className="text-[var(--text-secondary)] text-[15px] leading-relaxed mb-6 max-w-4xl">
                     {aiSummary}
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    <Badge variant="outline" className="border-gray-200 text-[#129780] bg-[#f0f9f8]">{post.category || 'General'}</Badge>
-                    <Badge variant="outline" className={`border-none ${post.urgency === 'High' ? 'bg-[#fef2f2] text-[#ef4444]' : 'border-gray-200 text-[#129780] bg-[#f0f9f8]'}`}>
+                    <Badge variant="outline" className="border-none text-[var(--accent)] bg-[var(--accent)]/10">{post.category || 'General'}</Badge>
+                    <Badge variant="outline" className={`border-none ${post.urgency === 'High' ? 'bg-[var(--badge-red-bg)] text-[var(--badge-red-text)]' : 'border-[var(--border-color)] text-[var(--accent)] bg-[var(--accent)]/10'}`}>
                       {post.urgency || 'Normal'}
                     </Badge>
                   </div>

@@ -51,19 +51,19 @@ export function PollCard({ poll, messageId, collectionPath = 'messages' }) {
   const winnerIndex = isClosed ? Object.entries(votes).reduce((max, curr) => curr[1].length > (votes[max]?.length || 0) ? curr[0] : max, 0) : null;
 
   return (
-    <div className="w-full max-w-sm bg-white/40 backdrop-blur-xl border border-white/20 rounded-[24px] p-6 shadow-xl overflow-hidden relative group">
+    <div className="w-full max-w-sm bg-[var(--bg-card)] backdrop-blur-xl border border-[var(--border-color)] rounded-[24px] p-6 shadow-xl overflow-hidden relative group">
       {/* Decorative Blur */}
       <div className="absolute -top-10 -right-10 w-24 h-24 bg-[#129780]/10 rounded-full blur-2xl group-hover:bg-[#129780]/20 transition-all"></div>
       
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-4">
-          <span className="text-[10px] font-black uppercase tracking-widest text-[#129780] bg-[#129780]/10 px-3 py-1 rounded-full">
+          <span className="text-[10px] font-black uppercase tracking-widest text-[var(--accent)] bg-[var(--accent)]/10 px-3 py-1 rounded-full">
             {isClosed ? 'Poll Closed' : 'Live Poll'}
           </span>
-          <span className="text-[10px] font-bold text-gray-400">{totalVotes} votes</span>
+          <span className="text-[10px] font-bold text-[var(--text-secondary)]">{totalVotes} votes</span>
         </div>
 
-        <h4 className="text-lg font-bold text-[#2b3231] mb-6 leading-tight">
+        <h4 className="text-lg font-bold text-[var(--text-primary)] mb-6 leading-tight">
           {poll.question}
         </h4>
 
@@ -80,30 +80,30 @@ export function PollCard({ poll, messageId, collectionPath = 'messages' }) {
                 disabled={isClosed}
                 className={`w-full relative text-left p-4 rounded-2xl transition-all border overflow-hidden ${
                   isVoted 
-                    ? 'border-[#129780] bg-white shadow-md' 
-                    : 'border-gray-100 bg-white/50 hover:bg-white hover:border-gray-200'
+                    ? 'border-[var(--accent)] bg-[var(--bg-card)] shadow-md' 
+                    : 'border-[var(--border-color)] bg-[var(--bg-secondary)] hover:bg-[var(--bg-card)] hover:border-[var(--accent)]/30'
                 } ${isClosed ? 'cursor-default' : 'cursor-pointer active:scale-[0.98]'}`}
               >
                 {/* Percentage Bar Background */}
                 <motion.div 
                   initial={{ width: 0 }}
                   animate={{ width: `${percentage}%` }}
-                  className={`absolute inset-0 opacity-10 -z-10 ${isWinner ? 'bg-[#129780]' : 'bg-gray-400'}`}
+                  className={`absolute inset-0 opacity-10 -z-10 ${isWinner ? 'bg-[var(--accent)]' : 'bg-[var(--text-secondary)]'}`}
                   transition={{ duration: 0.5, ease: "easeOut" }}
                 />
 
                 <div className="flex items-center justify-between relative z-10">
                   <div className="flex items-center gap-3">
-                    <span className={`text-sm font-bold ${isVoted ? 'text-[#129780]' : 'text-gray-700'}`}>
+                    <span className={`text-sm font-bold ${isVoted ? 'text-[var(--accent)]' : 'text-[var(--text-primary)]'}`}>
                       {option}
                     </span>
                     {isVoted && (
-                      <span className="text-[#129780]">
+                      <span className="text-[var(--accent)]">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                       </span>
                     )}
                   </div>
-                  <span className={`text-[10px] font-black ${isVoted ? 'text-[#129780]' : 'text-gray-400'}`}>
+                  <span className={`text-[10px] font-black ${isVoted ? 'text-[var(--accent)]' : 'text-[var(--text-secondary)]'}`}>
                     {percentage}%
                   </span>
                 </div>
@@ -115,7 +115,7 @@ export function PollCard({ poll, messageId, collectionPath = 'messages' }) {
         {poll.creatorId === currentUser?.uid && !isClosed && (
           <button
             onClick={handleClose}
-            className="w-full mt-6 py-2 text-[10px] font-black uppercase tracking-widest text-red-500 hover:text-red-600 transition-colors border-t border-gray-100 pt-4"
+            className="w-full mt-6 py-2 text-[10px] font-black uppercase tracking-widest text-red-500 hover:text-red-600 transition-colors border-t border-[var(--border-color)] pt-4"
           >
             Close Poll
           </button>

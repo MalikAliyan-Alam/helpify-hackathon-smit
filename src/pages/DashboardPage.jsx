@@ -155,14 +155,20 @@ export function DashboardPage() {
   return (
     <div className="flex flex-col gap-8 pb-12">
       {/* Header */}
-      <div className="bg-[#2b3231] rounded-[24px] p-10 flex flex-col text-white">
-        <p className="text-gray-400 font-bold text-xs uppercase tracking-wider mb-4">DASHBOARD</p>
-        <h1 className="text-4xl lg:text-[56px] font-bold tracking-tight mb-4">
-          Welcome back, {name}.
-        </h1>
-        <p className="text-gray-300 text-lg">
-          Your command center for requests, AI insights, helper momentum, and live community activity.
-        </p>
+      <div className="relative overflow-hidden rounded-[32px] p-10 lg:p-14 flex flex-col shadow-xl shadow-[var(--shadow)] border border-[var(--border-color)] group" style={{ background: 'var(--hero-gradient)' }}>
+        {/* Decorative elements */}
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-[var(--accent)] opacity-10 blur-[100px] rounded-full group-hover:opacity-20 transition-opacity duration-1000"></div>
+        <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-orange-500 opacity-[0.03] blur-[100px] rounded-full"></div>
+        
+        <div className="relative z-10">
+          <p className="opacity-60 font-black text-[10px] uppercase tracking-[0.3em] mb-4 text-[var(--hero-text)]">DASHBOARD</p>
+          <h1 className="text-4xl lg:text-[64px] font-black tracking-tighter mb-4 text-[var(--hero-text)] leading-[1.1]">
+            Welcome back,<br/> {name}.
+          </h1>
+          <p className="opacity-70 text-lg lg:text-xl max-w-2xl text-[var(--hero-text)] font-medium leading-relaxed">
+            Your command center for requests, AI insights, helper momentum, and live community activity.
+          </p>
+        </div>
       </div>
 
       {/* Daily Challenge Banner */}
@@ -330,7 +336,7 @@ export function DashboardPage() {
                   <div className="flex flex-wrap gap-2 mb-4">
                     <Badge variant="primary">{post.category || 'General'}</Badge>
                     <Badge variant="destructive">{post.urgency || 'Normal'}</Badge>
-                    <Badge variant="outline" className={`border-none ${post.status?.toLowerCase() === 'solved' ? 'bg-green-500/20 text-green-400' : 'bg-[var(--badge-green-bg)] text-[var(--accent)]'}`}>
+                    <Badge variant="outline" className={`border-none ${post.status?.toLowerCase() === 'solved' ? 'bg-green-500/20 text-green-400' : 'border-[var(--border-color)] text-[#129780] bg-[var(--bg-secondary)]'}`}>
                       {post.status || 'Open'}
                     </Badge>
                   </div>
@@ -361,8 +367,8 @@ export function DashboardPage() {
                 </Card>
               ))
             ) : (
-              <Card className="bg-white border-none shadow-sm rounded-[24px] p-12 text-center">
-                <p className="text-gray-500">No requests in the community yet. Be the first to ask for help!</p>
+              <Card className="border-none shadow-sm rounded-[24px] p-12 text-center">
+                <p className="text-[var(--text-secondary)]">No requests in the community yet. Be the first to ask for help!</p>
               </Card>
             )}
           </div>
@@ -435,7 +441,7 @@ export function DashboardPage() {
 
             <div className="space-y-4">
               {notifications.length === 0 ? (
-                <div className="text-sm text-gray-500 py-4 text-center">No recent updates.</div>
+                <div className="text-sm text-[var(--text-secondary)] py-4 text-center">No recent updates.</div>
               ) : (
                 notifications.map(notif => (
                   <div key={notif.id} className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[16px] p-4 flex items-center justify-between gap-4">

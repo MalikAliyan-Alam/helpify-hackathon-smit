@@ -186,7 +186,7 @@ export function LeaderboardPage() {
                         </span>
                       ))}
                     </div>
-                    {user.id !== currentUser.uid && (
+                    {currentUser && user.id !== currentUser.uid && (
                       <KudosButton 
                         targetUserId={user.id} 
                         messageId={`profile-${user.id}`} 
@@ -194,7 +194,7 @@ export function LeaderboardPage() {
                         currentKudos={user.kudosCount || 0}
                       />
                     )}
-                    {isMe && <span className="bg-[#129780] text-white text-[8px] font-black uppercase px-2 py-0.5 rounded-full">YOU</span>}
+                    {currentUser && isMe && <span className="bg-[#129780] text-white text-[8px] font-black uppercase px-2 py-0.5 rounded-full">YOU</span>}
                   </div>
                   <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
                     {user.verifiedSkill || 'Community Helper'}

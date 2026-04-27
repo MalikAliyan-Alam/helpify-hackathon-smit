@@ -129,31 +129,31 @@ export function MessagesPage() {
   return (
     <div className="flex flex-col gap-8 pb-12">
       {/* Header */}
-      <div className="bg-[#2b3231] rounded-[24px] p-10 flex flex-col text-white">
-        <p className="text-gray-400 font-bold text-xs uppercase tracking-wider mb-4">INTERACTION / MESSAGING</p>
+      <div className="bg-[var(--hero-bg)] rounded-[24px] p-10 flex flex-col text-[var(--hero-text)]">
+        <p className="opacity-60 font-bold text-xs uppercase tracking-wider mb-4">INTERACTION / MESSAGING</p>
         <h1 className="text-4xl lg:text-5xl font-bold tracking-tight mb-4 max-w-2xl">
           Keep support moving through direct communication.
         </h1>
-        <p className="text-gray-300 text-lg max-w-xl">
+        <p className="opacity-80 text-lg max-w-xl">
           Basic messaging gives helpers and requesters a clear follow-up path once a match happens.
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
         {/* Conversation Stream */}
-        <Card className="bg-[#fdfcf9] border-none shadow-sm rounded-[24px] p-8">
-          <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-2">CONVERSATION STREAM</p>
-          <h3 className="text-3xl font-bold text-[#2b3231] mb-8">Recent messages</h3>
+        <Card className="border-none shadow-sm rounded-[24px] p-8">
+          <p className="text-[var(--accent)] font-bold text-[10px] uppercase tracking-wider mb-2">CONVERSATION STREAM</p>
+          <h3 className="text-3xl font-bold text-[var(--text-primary)] mb-8">Recent messages</h3>
 
           <div className="space-y-4">
             {messages.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">No messages yet. Start a conversation!</div>
+              <div className="text-center py-8 text-[var(--text-secondary)]">No messages yet. Start a conversation!</div>
             ) : (
               messages.map((msg) => (
-                <div key={msg.id} className="bg-white border border-gray-100 rounded-[16px] p-5 flex items-start justify-between gap-4">
+                <div key={msg.id} className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[16px] p-5 flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-4 mb-2">
-                      <p className="font-bold text-sm text-[#2b3231] truncate">
+                      <p className="font-bold text-sm text-[var(--text-primary)] truncate">
                         {msg.senderName} → {msg.receiverName}
                       </p>
                       {msg.senderId !== currentUser.uid && (
@@ -165,7 +165,7 @@ export function MessagesPage() {
                         />
                       )}
                     </div>
-                    <p className="text-gray-600 text-sm leading-relaxed break-words">
+                    <p className="text-[var(--text-secondary)] text-sm leading-relaxed break-words">
                       {msg.audioURL ? (
                         <div className="mt-2">
                           <audio src={msg.audioURL} controls className="h-8 w-full max-w-[200px]" />
@@ -175,7 +175,7 @@ export function MessagesPage() {
                       )}
                     </p>
                   </div>
-                  <div className="w-16 h-12 rounded-[12px] bg-[#e8f3f1] flex items-center justify-center flex-shrink-0 text-[#129780] text-xs font-bold text-center leading-tight shadow-sm border border-[#d1e8e4]">
+                  <div className="w-16 h-12 rounded-[12px] bg-[var(--bg-card)] flex items-center justify-center flex-shrink-0 text-[var(--accent)] text-xs font-bold text-center leading-tight shadow-sm border border-[var(--border-color)]">
                     {formatTime(msg.createdAt)}
                   </div>
                 </div>
@@ -185,17 +185,17 @@ export function MessagesPage() {
         </Card>
 
         {/* Send Message Form */}
-        <Card className="bg-white border-none shadow-sm rounded-[24px] p-8">
-          <p className="text-[#129780] font-bold text-[10px] uppercase tracking-wider mb-2">SEND MESSAGE</p>
-          <h3 className="text-3xl font-bold text-[#2b3231] mb-8">Start a conversation</h3>
+        <Card className="border-none shadow-sm rounded-[24px] p-8">
+          <p className="text-[var(--accent)] font-bold text-[10px] uppercase tracking-wider mb-2">SEND MESSAGE</p>
+          <h3 className="text-3xl font-bold text-[var(--text-primary)] mb-8">Start a conversation</h3>
 
           <form onSubmit={handleSendMessage} className="space-y-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">To</label>
+              <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-2">To</label>
               <select 
                 value={selectedUser}
                 onChange={(e) => setSelectedUser(e.target.value)}
-                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#129780] appearance-none"
+                className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] appearance-none"
               >
                 {users.map(u => (
                   <option key={u.id} value={u.id}>{u.name}</option>
@@ -204,13 +204,13 @@ export function MessagesPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Message</label>
+              <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-2">Message</label>
               <textarea 
                 rows="5"
                 value={messageContent}
                 onChange={(e) => setMessageContent(e.target.value)}
                 placeholder="Share support details, ask for files, or suggest next steps." 
-                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#129780] resize-none"
+                className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] resize-none"
               ></textarea>
             </div>
 

@@ -51,20 +51,33 @@ export function SignupPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[70vh] pb-12">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="w-12 h-12 rounded-xl bg-[#129780] flex items-center justify-center text-white font-bold text-2xl mx-auto mb-4">
-            H
-          </div>
-          <h1 className="text-3xl font-bold text-[#2b3231] tracking-tight mb-2">Join the platform</h1>
-          <p className="text-gray-500">Create an account to start asking and helping.</p>
+    <div className="relative min-h-screen flex items-center justify-center py-12 px-4 overflow-hidden">
+      {/* Background Decorative Blurs */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-[var(--accent)] opacity-[0.07] blur-[120px] rounded-full"></div>
+        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-blue-500 opacity-[0.05] blur-[120px] rounded-full"></div>
+      </div>
+
+      <div className="w-full max-w-md relative z-10">
+        <div className="text-center mb-10">
+          <Link to="/" className="inline-flex flex-col items-center group">
+            <div className="relative w-14 h-14 flex items-center justify-center mb-6">
+              <div className="absolute inset-0 bg-[var(--accent)] opacity-20 blur-xl rounded-full group-hover:opacity-30 transition-opacity"></div>
+              <div className="relative w-10 h-10 transform -rotate-12 group-hover:rotate-0 transition-transform duration-500">
+                <div className="absolute top-0 left-0 w-7 h-7 bg-gradient-to-tr from-[var(--accent)] to-[#2dd4bf] rounded-lg z-30 shadow-lg border border-white/20"></div>
+                <div className="absolute top-2 left-2 w-7 h-7 bg-[var(--accent)] opacity-60 rounded-lg z-20"></div>
+                <div className="absolute top-4 left-4 w-7 h-7 bg-[var(--accent)] opacity-30 rounded-lg z-10"></div>
+              </div>
+            </div>
+            <h1 className="text-4xl font-black text-[var(--text-primary)] tracking-tighter mb-2">Join Helplystack</h1>
+            <p className="text-[var(--text-secondary)] font-medium">Create an account to start your journey.</p>
+          </Link>
         </div>
 
-        <Card className="bg-white border-none shadow-sm rounded-[24px] p-8">
+        <Card className="border border-[var(--glass-border)] shadow-2xl rounded-[32px] p-8 lg:p-10 bg-[var(--glass-bg)] backdrop-blur-2xl">
           <Button 
             variant="outline" 
-            className="w-full rounded-full font-semibold py-3 text-base border-gray-200 shadow-sm bg-white text-gray-700 mb-6 flex items-center justify-center gap-3" 
+            className="w-full rounded-2xl font-bold py-4 text-sm border-[var(--border-color)] shadow-sm bg-[var(--bg-card)] text-[var(--text-primary)] mb-8 flex items-center justify-center gap-3 hover:bg-[var(--bg-secondary)] transition-all" 
             type="button"
             onClick={handleGoogleSignIn}
             disabled={loading}
@@ -78,57 +91,57 @@ export function SignupPage() {
             Continue with Google
           </Button>
           
-          <div className="relative mb-6">
+          <div className="relative mb-8">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200"></div>
+              <div className="w-full border-t border-[var(--border-color)]"></div>
             </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or continue with</span>
+            <div className="relative flex justify-center text-[10px] font-black uppercase tracking-widest">
+              <span className="px-4 bg-transparent text-[var(--text-secondary)]">Or secure sign up</span>
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+              <label className="block text-xs font-black text-[var(--text-secondary)] uppercase tracking-widest mb-2 px-1">Full Name</label>
               <input 
                 type="text" 
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#129780]"
-                placeholder="Ayesha Khan"
+                className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl px-5 py-4 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 transition-all font-medium"
+                placeholder="Enter your name"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+              <label className="block text-xs font-black text-[var(--text-secondary)] uppercase tracking-widest mb-2 px-1">Email Address</label>
               <input 
                 type="email" 
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#129780]"
-                placeholder="hello@example.com"
+                className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl px-5 py-4 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 transition-all font-medium"
+                placeholder="hello@helplystack.com"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+              <label className="block text-xs font-black text-[var(--text-secondary)] uppercase tracking-widest mb-2 px-1">Password</label>
               <input 
                 type="password" 
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#129780]"
-                placeholder="••••••••"
+                className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl px-5 py-4 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 transition-all font-medium"
+                placeholder="Create a strong password"
                 minLength="6"
               />
             </div>
-            <Button disabled={loading} className="w-full rounded-full font-semibold py-3 text-base mt-2" type="submit">
+            <Button disabled={loading} className="w-full rounded-2xl font-black py-4 text-base mt-4 shadow-xl shadow-[var(--accent)]/20" type="submit">
               {loading ? 'Creating account...' : 'Create account'}
             </Button>
           </form>
           
-          <div className="mt-6 text-center text-sm text-gray-600">
-            Already have an account? <Link to="/login" className="text-[#129780] font-bold hover:underline">Log in</Link>
+          <div className="mt-8 text-center text-sm text-[var(--text-secondary)]">
+            Already have an account? <Link to="/login" className="text-[var(--accent)] font-bold hover:underline ml-1">Log in</Link>
           </div>
         </Card>
       </div>

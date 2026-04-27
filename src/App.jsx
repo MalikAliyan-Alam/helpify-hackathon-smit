@@ -91,9 +91,7 @@ function App() {
             <Route path="notifications" element={
               <PrivateRoute><NotificationsPage /></PrivateRoute>
             } />
-            <Route path="leaderboard" element={
-              <PrivateRoute><LeaderboardPage /></PrivateRoute>
-            } />
+            <Route path="leaderboard" element={<LeaderboardPage />} />
             <Route path="polls" element={
               <PrivateRoute><PollsPage /></PrivateRoute>
             } />

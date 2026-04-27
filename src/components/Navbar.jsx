@@ -38,40 +38,36 @@ export function Navbar() {
 
   const isAdmin = userData?.role === 'admin' || currentUser?.email === 'admin@helpify.com';
 
-  const displayedLinks = currentUser ? (
-    isAdmin ? [
-      { name: 'Admin Panel', path: '/admin' },
-      { name: 'Explore', path: '/explore' },
-      { name: 'Leaderboard', path: '/leaderboard' },
-      { name: 'Polls', path: '/polls' },
-      { name: 'Messages', path: '/messages' },
-      { name: 'Sessions', path: '/sessions' },
-      { name: 'Profile', path: '/profile' }
-    ] : [
-      { name: 'Dashboard', path: '/dashboard' },
-      { name: 'Explore', path: '/explore' },
-      { name: 'Leaderboard', path: '/leaderboard' },
-      { name: 'Polls', path: '/polls' },
-      { name: 'Create Request', path: '/create' },
-      { name: 'Messages', path: '/messages' },
-      { name: 'Sessions', path: '/sessions' },
-      { name: 'Profile', path: '/profile' }
-    ]
-  ) : [
+  const displayedLinks = isAdmin ? [
+    { name: 'Admin Panel', path: '/admin' },
     { name: 'Explore', path: '/explore' },
+    { name: 'Leaderboard', path: '/leaderboard' },
+    { name: 'Polls', path: '/polls' },
+    { name: 'Messages', path: '/messages' },
+    { name: 'Sessions', path: '/sessions' },
+    { name: 'Profile', path: '/profile' }
+  ] : [
+    { name: 'Dashboard', path: '/dashboard' },
+    { name: 'Explore', path: '/explore' },
+    { name: 'Leaderboard', path: '/leaderboard' },
+    { name: 'Polls', path: '/polls' },
+    { name: 'Create Request', path: '/create' },
+    { name: 'Messages', path: '/messages' },
+    { name: 'Sessions', path: '/sessions' },
+    { name: 'Profile', path: '/profile' }
   ];
 
   async function handleLogout() {
     toast((t) => (
       <div className="flex flex-col gap-4 min-w-[280px] p-1">
         <div>
-          <h4 className="font-bold text-[#2b3231] text-lg mb-1">Confirm Logout</h4>
-          <p className="text-sm text-gray-500">Are you sure you want to leave your session?</p>
+          <h4 className="font-bold text-[var(--text-primary)] text-lg mb-1">Confirm Logout</h4>
+          <p className="text-sm text-[var(--text-secondary)]">Are you sure you want to leave your session?</p>
         </div>
         <div className="flex items-center justify-end gap-3 mt-2">
           <button
             onClick={() => toast.dismiss(t.id)}
-            className="px-5 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+            className="px-5 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] rounded-full transition-colors"
           >
             Cancel
           </button>
@@ -96,10 +92,14 @@ export function Navbar() {
       position: 'top-center',
       style: {
         maxWidth: '400px',
-        padding: '16px',
-        borderRadius: '24px',
-        border: '1px solid #f3f4f6',
-        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)'
+        padding: '24px',
+        borderRadius: '28px',
+        background: 'var(--glass-bg)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: '1px solid var(--glass-border)',
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+        color: 'var(--text-primary)'
       }
     });
   }
@@ -107,18 +107,29 @@ export function Navbar() {
   return (
     <nav className="sticky top-0 z-[100] bg-[var(--glass-bg)] backdrop-blur-xl border-b border-[var(--glass-border)] px-6 py-3 transition-all duration-300">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-        {/* Logo Section */}
+        {/* Logo Section - flex-1 to push nav to center */}
         <div className="flex-1 flex justify-start">
-          <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 rounded-xl bg-[var(--accent)] flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-[var(--accent)]/20 group-hover:scale-105 transition-transform">
-              H
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="relative w-10 h-10 flex items-center justify-center">
+              {/* Logo: Isometric Stack */}
+              <div className="relative w-7 h-7 transform -rotate-12 group-hover:rotate-0 transition-transform duration-500">
+                {/* Top Layer */}
+                <div className="absolute top-0 left-0 w-5 h-5 bg-gradient-to-tr from-[var(--accent)] to-[#2dd4bf] rounded-md z-30 shadow-lg border border-white/20"></div>
+                {/* Middle Layer */}
+                <div className="absolute top-1.5 left-1.5 w-5 h-5 bg-[var(--accent)] opacity-60 rounded-md z-20 shadow-md"></div>
+                {/* Bottom Layer */}
+                <div className="absolute top-3 left-3 w-5 h-5 bg-[var(--accent)] opacity-30 rounded-md z-10"></div>
+                
+                {/* Center dot/accent */}
+                <div className="absolute top-[6px] left-[6px] w-1.5 h-1.5 bg-white rounded-full z-40 shadow-sm animate-pulse"></div>
+              </div>
             </div>
-            <span className="font-black text-[var(--text-primary)] text-lg tracking-tighter">Helplytics <span className="text-[var(--accent)]">AI</span></span>
+            <span className="font-black text-[var(--text-primary)] text-xl tracking-tighter">Helplystack</span>
           </Link>
         </div>
 
-        {/* Center Navigation - Core Links */}
-        <div className="hidden lg:flex items-center bg-[var(--bg-secondary)] p-1 rounded-full border border-[var(--border-color)]">
+        {/* Center Navigation - Perfectly Centered */}
+        <div className="hidden lg:flex items-center bg-[var(--bg-secondary)] p-1.5 rounded-full border border-[var(--border-color)] shadow-inner">
           {displayedLinks.slice(0, 3).map((link) => {
             const isActive = location.pathname === link.path;
             return (
@@ -202,9 +213,9 @@ export function Navbar() {
             </>
           ) : !isAuthPage ? (
             <div className="flex items-center gap-4">
-              <Link to="/login" className="text-gray-600 font-bold text-sm hover:text-gray-900 transition-colors">Log in</Link>
+              <Link to="/login" className="text-[var(--text-secondary)] font-bold text-sm hover:text-[var(--text-primary)] transition-colors">Log in</Link>
               <Link to="/signup">
-                <Button variant="default" className="rounded-xl px-6 py-2.5 text-sm font-black shadow-lg shadow-[#129780]/20">Join Now</Button>
+                <Button variant="default" className="rounded-xl px-6 py-2.5 text-sm font-black shadow-lg shadow-[var(--accent)]/20">Join Now</Button>
               </Link>
             </div>
           ) : null}

@@ -58,12 +58,12 @@ export function ExplorePage() {
   return (
     <div className="flex flex-col gap-8 pb-12">
       {/* Header */}
-      <div className="bg-[#2b3231] rounded-[24px] p-10 flex flex-col text-white">
-        <p className="text-gray-400 font-bold text-xs uppercase tracking-wider mb-4">EXPLORE / FEED</p>
+      <div className="bg-[var(--hero-bg)] rounded-[24px] p-10 flex flex-col text-[var(--hero-text)]">
+        <p className="text-[var(--accent)] font-bold text-xs uppercase tracking-wider mb-4">EXPLORE / FEED</p>
         <h1 className="text-4xl lg:text-5xl font-bold tracking-tight mb-4 max-w-2xl">
           Browse help requests with filterable community context.
         </h1>
-        <p className="text-gray-300 text-lg max-w-xl">
+        <p className="opacity-80 text-lg max-w-xl">
           Filter by category, urgency, skills, and location to surface the best matches.
         </p>
       </div>
@@ -76,7 +76,7 @@ export function ExplorePage() {
 
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Category</label>
+              <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-2">Category</label>
               <select 
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
@@ -90,7 +90,7 @@ export function ExplorePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Urgency</label>
+              <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-2">Urgency</label>
               <select 
                 value={urgencyFilter}
                 onChange={(e) => setUrgencyFilter(e.target.value)}
@@ -104,7 +104,7 @@ export function ExplorePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Skills</label>
+              <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-2">Skills</label>
               <input 
                 type="text" 
                 value={skillsFilter}
@@ -115,7 +115,7 @@ export function ExplorePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Location</label>
+              <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-2">Location</label>
               <input 
                 type="text" 
                 value={locationFilter}
@@ -149,8 +149,8 @@ export function ExplorePage() {
               <Card key={post.id} className="border-none shadow-sm rounded-[24px] p-6 lg:p-8 flex flex-col">
                 <div className="flex flex-wrap gap-2 mb-4">
                   <Badge variant="primary">{post.category || 'General'}</Badge>
-                  <Badge variant="destructive" className="bg-[#fef2f2] text-[#ef4444] border-none">{post.urgency || 'Normal'}</Badge>
-                  <Badge variant="outline" className={`border-none ${post.status?.toLowerCase() === 'solved' ? 'bg-green-500/20 text-green-400' : 'border-gray-200 text-[#129780] bg-[#f0f9f8]'}`}>
+                  <Badge variant="destructive" className="bg-[var(--badge-red-bg)] text-[var(--badge-red-text)] border-none">{post.urgency || 'Normal'}</Badge>
+                  <Badge variant="outline" className={`border-none ${post.status?.toLowerCase() === 'solved' ? 'bg-green-500/20 text-green-400' : 'border-[var(--border-color)] text-[#129780] bg-[var(--bg-secondary)]'}`}>
                     {post.status || 'Open'}
                   </Badge>
                 </div>
@@ -169,7 +169,7 @@ export function ExplorePage() {
                   <div className="flex items-center gap-3">
                     <div>
                       <div className="flex items-center gap-1.5">
-                        <p className="font-bold text-sm text-[#2b3231]">{post.authorName || 'Anonymous'}</p>
+                        <p className="font-bold text-sm text-[var(--text-primary)]">{post.authorName || 'Anonymous'}</p>
                         {post.authorVerified && (
                           <div className="text-[#129780] bg-[#129780]/10 p-0.5 rounded-full cursor-help group relative">
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -179,7 +179,7 @@ export function ExplorePage() {
                           </div>
                         )}
                       </div>
-                      <p className="text-xs text-gray-500">{post.authorLocation || 'Unknown'} • {post.helpers?.length || 0} helpers interested</p>
+                      <p className="text-xs text-[var(--text-secondary)]">{post.authorLocation || 'Unknown'} • {post.helpers?.length || 0} helpers interested</p>
                     </div>
                   </div>
                   <Button 
@@ -193,8 +193,8 @@ export function ExplorePage() {
               </Card>
             ))
           ) : (
-            <Card className="bg-white border-none shadow-sm rounded-[24px] p-12 text-center">
-              <p className="text-gray-500">No requests found matching your filters.</p>
+            <Card className="border-none shadow-sm rounded-[24px] p-12 text-center">
+              <p className="text-[var(--text-secondary)]">No requests found matching your filters.</p>
             </Card>
           )}
         </div>

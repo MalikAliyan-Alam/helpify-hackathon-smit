@@ -206,7 +206,7 @@ export function RequestDetailPage() {
   };
 
   if (loading) {
-    return <div className="flex justify-center items-center h-64 text-gray-500 font-medium">Loading request details...</div>;
+    return <div className="flex justify-center items-center h-64 text-[var(--text-secondary)] font-medium">Loading request details...</div>;
   }
 
   if (!post) return null;
@@ -224,8 +224,8 @@ export function RequestDetailPage() {
   return (
     <div className="flex flex-col gap-8 pb-12">
       {/* Header Card */}
-      <div className="bg-[#2b3231] rounded-[24px] p-8 lg:p-12 flex flex-col text-white shadow-sm">
-        <p className="text-gray-400 font-bold text-xs uppercase tracking-wider mb-6">REQUEST DETAIL</p>
+      <div className="bg-[var(--hero-bg)] rounded-[24px] p-8 lg:p-12 flex flex-col text-[var(--hero-text)] shadow-sm">
+        <p className="opacity-60 font-bold text-xs uppercase tracking-wider mb-6">REQUEST DETAIL</p>
         <div className="flex flex-wrap gap-2 mb-6">
           {isChallenge && (
              <Badge variant="outline" className="border-none bg-yellow-400 text-[#2b3231] font-black uppercase tracking-tighter px-3 py-1 animate-pulse">
@@ -238,10 +238,10 @@ export function RequestDetailPage() {
             {post.status || 'Open'}
           </Badge>
         </div>
-        <h1 className="text-4xl lg:text-[56px] font-bold tracking-tight leading-[1.1] mb-6 text-white">
+        <h1 className="text-4xl lg:text-[56px] font-bold tracking-tight leading-[1.1] mb-6 text-[var(--hero-text)]">
           {post.title}
         </h1>
-        <p className="text-gray-200 text-lg leading-relaxed max-w-3xl">
+        <p className="opacity-90 text-lg leading-relaxed max-w-3xl">
           {post.description}
         </p>
 

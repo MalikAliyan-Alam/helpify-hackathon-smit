@@ -160,6 +160,19 @@ export function Navbar() {
 
         {/* Right Actions Cluster */}
         <div className="flex-1 flex justify-end items-center gap-3">
+          {/* Theme Toggle - Visible to All */}
+          <button 
+            onClick={toggleTheme}
+            className="p-2.5 bg-[var(--bg-secondary)] rounded-xl border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/80 transition-colors shadow-sm"
+            title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          >
+            {isDarkMode ? (
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+            )}
+          </button>
+
           {currentUser ? (
             <>
               {/* Streak */}
@@ -170,18 +183,6 @@ export function Navbar() {
                 </div>
               )}
 
-              {/* Theme Toggle */}
-              <button 
-                onClick={toggleTheme}
-                className="p-2.5 bg-[var(--bg-secondary)] rounded-xl border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/80 transition-colors"
-                title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-              >
-                {isDarkMode ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-                )}
-              </button>
 
               {/* Notifications Icon */}
               <Link to="/notifications" className="relative p-2.5 bg-[var(--bg-secondary)] rounded-xl border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/80 transition-colors">
@@ -211,14 +212,24 @@ export function Navbar() {
                  </div>
               </div>
             </>
-          ) : !isAuthPage ? (
+          ) : (
             <div className="flex items-center gap-4">
-              <Link to="/login" className="text-[var(--text-secondary)] font-bold text-sm hover:text-[var(--text-primary)] transition-colors">Log in</Link>
-              <Link to="/signup">
-                <Button variant="default" className="rounded-xl px-6 py-2.5 text-sm font-black shadow-lg shadow-[var(--accent)]/20">Join Now</Button>
-              </Link>
+              {location.pathname === '/signup' ? (
+                <Link to="/login" className="text-[var(--text-secondary)] font-bold text-sm hover:text-[var(--text-primary)] transition-colors">Log in</Link>
+              ) : location.pathname === '/login' ? (
+                <Link to="/signup">
+                  <Button variant="default" className="rounded-xl px-6 py-2.5 text-sm font-black shadow-lg shadow-[var(--accent)]/20">Join Now</Button>
+                </Link>
+              ) : (
+                <>
+                  <Link to="/login" className="text-[var(--text-secondary)] font-bold text-sm hover:text-[var(--text-primary)] transition-colors">Log in</Link>
+                  <Link to="/signup">
+                    <Button variant="default" className="rounded-xl px-6 py-2.5 text-sm font-black shadow-lg shadow-[var(--accent)]/20">Join Now</Button>
+                  </Link>
+                </>
+              )}
             </div>
-          ) : null}
+          )}
         </div>
       </div>
     </nav>

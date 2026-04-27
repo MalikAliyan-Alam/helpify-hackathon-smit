@@ -150,9 +150,26 @@ export function AuthProvider({ children }) {
   return (
     <AuthContext.Provider value={value}>
       {loading ? (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-[#f6f3eb] gap-4">
-          <div className="w-12 h-12 rounded-xl bg-[#129780] flex items-center justify-center text-white font-bold text-2xl animate-pulse">
-            H
+        <div className="flex flex-col items-center justify-center min-h-screen bg-[var(--bg-page)] transition-colors duration-500">
+          <div className="relative w-24 h-24 flex items-center justify-center">
+            {/* Ambient Glow */}
+            <div className="absolute inset-0 bg-[var(--accent)] opacity-20 blur-3xl rounded-full animate-pulse"></div>
+            
+            {/* Animated Isometric Stack */}
+            <div className="relative w-12 h-12 transform rotate-12 animate-bounce-gentle">
+              {/* Top Layer */}
+              <div className="absolute top-0 left-0 w-10 h-10 bg-gradient-to-tr from-[var(--accent)] to-[#2dd4bf] rounded-xl z-30 shadow-2xl border border-white/20 animate-pulse"></div>
+              {/* Middle Layer */}
+              <div className="absolute top-3 left-3 w-10 h-10 bg-[var(--accent)] opacity-60 rounded-xl z-20 shadow-xl"></div>
+              {/* Bottom Layer */}
+              <div className="absolute top-6 left-6 w-10 h-10 bg-[var(--accent)] opacity-30 rounded-xl z-10"></div>
+              
+              {/* Center Active Node */}
+              <div className="absolute top-[14px] left-[14px] w-3 h-3 bg-white rounded-full z-40 shadow-inner animate-ping"></div>
+            </div>
+          </div>
+          <div className="mt-12 text-[var(--text-secondary)] font-black text-[10px] uppercase tracking-[0.4em] animate-pulse">
+            Helplystack initializing
           </div>
         </div>
       ) : children}

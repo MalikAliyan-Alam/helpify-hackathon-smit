@@ -64,22 +64,27 @@ export function PollsPage() {
   return (
     <div className="flex flex-col gap-8 pb-12">
       {/* Header */}
-      <div className="bg-[var(--hero-bg)] rounded-[24px] p-10 flex flex-col md:flex-row md:items-center justify-between text-[var(--hero-text)] gap-6">
-        <div className="flex-1">
-          <p className="opacity-60 font-bold text-xs uppercase tracking-wider mb-4">COMMUNITY / GOVERNANCE</p>
-          <h1 className="text-4xl lg:text-5xl font-bold tracking-tight mb-4">
+      <div className="relative overflow-hidden rounded-[32px] p-10 lg:p-14 flex flex-col md:flex-row md:items-center justify-between shadow-xl shadow-[var(--shadow)] border border-[var(--border-color)] group gap-6" style={{ background: 'var(--hero-gradient)' }}>
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-[var(--accent)] opacity-10 blur-[100px] rounded-full group-hover:opacity-20 transition-opacity duration-1000"></div>
+        <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-orange-500 opacity-[0.03] blur-[100px] rounded-full"></div>
+        
+        <div className="relative z-10 flex-1">
+          <p className="opacity-60 font-black text-[10px] uppercase tracking-[0.3em] mb-4 text-[var(--hero-text)]">COMMUNITY / GOVERNANCE</p>
+          <h1 className="text-4xl lg:text-[64px] font-black tracking-tighter mb-4 text-[var(--hero-text)] leading-[1.1]">
             Voice your opinion on platform evolution.
           </h1>
-          <p className="opacity-80 text-lg max-w-xl">
+          <p className="opacity-70 text-lg lg:text-xl max-w-xl text-[var(--hero-text)] font-medium leading-relaxed">
             Polls help us decide on new features, community guidelines, and technical approaches.
           </p>
         </div>
-        <Button 
-          onClick={() => setShowForm(!showForm)}
-          className={`rounded-full px-8 py-6 text-lg font-bold shadow-xl transition-all ${showForm ? 'bg-red-500 hover:bg-red-600' : 'bg-[#129780] hover:bg-[#0f806c]'}`}
-        >
-          {showForm ? 'Cancel Creation' : 'Start New Poll 📊'}
-        </Button>
+        <div className="relative z-10">
+          <Button 
+            onClick={() => setShowForm(!showForm)}
+            className={`rounded-full px-8 py-6 text-lg font-bold shadow-xl transition-all ${showForm ? 'bg-red-500 hover:bg-red-600 text-white border-none' : 'bg-[var(--accent)] hover:bg-[var(--accent)]/90 text-white border-none'}`}
+          >
+            {showForm ? 'Cancel Creation' : 'Start New Poll 📊'}
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-8 items-start">

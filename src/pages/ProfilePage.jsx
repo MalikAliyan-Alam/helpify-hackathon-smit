@@ -115,83 +115,94 @@ export function ProfilePage() {
   return (
     <div className="flex flex-col gap-8 pb-12">
       {/* Header */}
-      <div className="bg-[var(--hero-bg)] rounded-[24px] p-10 flex flex-col text-[var(--hero-text)]">
-        <div className="flex items-center justify-between mb-2">
-          <p className="opacity-60 font-bold text-xs uppercase tracking-wider">PROFILE</p>
-          {currentUser && currentUser.uid !== userData?.uid && (
-            <button 
-              onClick={() => setIsReportOpen(true)}
-              className="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-5 py-2 rounded-full text-[11px] font-bold uppercase tracking-wider flex items-center gap-2 transition-all border border-red-500/20"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-              Report Profile
-            </button>
-          )}
-        </div>
-        <div className="flex items-center gap-4 mb-4">
-          <h1 className="text-4xl lg:text-[56px] font-bold tracking-tight text-[var(--hero-text)]">
-            {name}
-          </h1>
-          <div className="flex gap-2">
-            {pinnedBadges.map(id => {
-              const badge = BADGE_DEFINITIONS[id];
-              return (
-                <div key={id} className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-sm shadow-inner group relative">
-                  {badge?.icon}
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-[8px] rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                    {badge?.name}
-                  </div>
-                </div>
-              );
-            })}
-            {kudosCount > 0 && (
-              <div className="flex items-center gap-1.5 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full border border-white/20 shadow-sm animate-in fade-in zoom-in duration-500">
-                <span className="text-xs">👏</span>
-                <span className="text-[10px] font-black text-white">{kudosCount}</span>
-              </div>
-            )}
-            {currentUser?.uid !== userData?.uid && (
-               <KudosButton 
-                  targetUserId={userData?.uid} 
-                  messageId={`profile-${userData?.uid}`} 
-                  kudosGiven={userData?.kudosVoters || []} 
-                  currentKudos={userData?.kudosCount || 0}
-               />
+      <div className="relative overflow-hidden rounded-[32px] p-10 lg:p-14 flex flex-col shadow-xl shadow-[var(--shadow)] border border-[var(--border-color)] group" style={{ background: 'var(--hero-gradient)' }}>
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-[var(--accent)] opacity-10 blur-[100px] rounded-full group-hover:opacity-20 transition-opacity duration-1000"></div>
+        <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-orange-500 opacity-[0.03] blur-[100px] rounded-full"></div>
+        
+        <div className="relative z-10">
+          <div className="flex items-center justify-between mb-4">
+            <p className="opacity-60 font-black text-[10px] uppercase tracking-[0.3em] text-[var(--hero-text)]">PROFILE</p>
+            {currentUser && currentUser.uid !== userData?.uid && (
+              <button 
+                onClick={() => setIsReportOpen(true)}
+                className="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-5 py-2 rounded-full text-[11px] font-bold uppercase tracking-wider flex items-center gap-2 transition-all border border-red-500/20"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                Report Profile
+              </button>
             )}
           </div>
-          {userData?.verified && (
-            <div className="bg-[#129780] text-white p-1.5 rounded-full shadow-lg shadow-[#129780]/40 group relative cursor-help">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1 bg-gray-900 text-white text-[10px] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
-                Verified Expert in {userData.verifiedSkill}
-              </div>
+          <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6 mb-4">
+            <h1 className="text-4xl lg:text-[64px] font-black tracking-tighter text-[var(--hero-text)] leading-[1.1] break-all">
+              {name}
+            </h1>
+            <div className="flex items-center gap-3 flex-wrap">
+              {userData?.verified && (
+                <div className="bg-[#129780] text-white p-2 rounded-full shadow-lg shadow-[#129780]/30 group relative cursor-help flex items-center justify-center ring-4 ring-[#129780]/10">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-1.5 bg-gray-900 text-white text-xs font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none shadow-xl">
+                    Verified Expert in {userData.verifiedSkill}
+                  </div>
+                </div>
+              )}
+              {kudosCount > 0 && (
+                <div className="flex items-center gap-1.5 px-4 py-2 bg-white/50 backdrop-blur-md rounded-full shadow-sm border border-black/5 transition-transform hover:scale-105">
+                  <span className="text-sm leading-none">👏</span>
+                  <span className="text-sm font-black text-[var(--text-primary)] leading-none">{kudosCount}</span>
+                </div>
+              )}
+              {pinnedBadges.map(id => {
+                const badge = BADGE_DEFINITIONS[id];
+                return (
+                  <div key={id} className="w-10 h-10 rounded-full bg-white/50 backdrop-blur-md flex items-center justify-center text-lg shadow-sm border border-black/5 group relative hover:scale-105 transition-transform">
+                    {badge?.icon}
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-1.5 bg-gray-900 text-white text-xs font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 shadow-xl pointer-events-none">
+                      {badge?.name}
+                    </div>
+                  </div>
+                );
+              })}
+              {currentUser?.uid !== userData?.uid && (
+                 <KudosButton 
+                    targetUserId={userData?.uid} 
+                    messageId={`profile-${userData?.uid}`} 
+                    kudosGiven={userData?.kudosVoters || []} 
+                    currentKudos={userData?.kudosCount || 0}
+                 />
+              )}
             </div>
-          )}
+          </div>
+          <p className="opacity-70 text-lg lg:text-xl font-medium text-[var(--hero-text)]">
+            Helper • {location}
+          </p>
         </div>
-        <p className="opacity-80 text-sm font-medium">
-          Helper • {location}
-        </p>
       </div>
 
       {/* Verified Expert Banner */}
       {userData?.verified && (
-        <Card className="bg-gradient-to-r from-[#129780] to-[#0f7a68] border-none shadow-xl rounded-[24px] p-8 text-white relative overflow-hidden group">
-           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-white/20 transition-all"></div>
-           <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="flex items-center gap-6 text-center md:text-left flex-col md:flex-row">
-                <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-3xl shadow-inner">
-                  ✅
-                </div>
-                <div>
-                  <h3 className="text-3xl font-bold mb-1">Verified Expert</h3>
-                  <p className="text-white/80 font-medium tracking-wide uppercase text-xs">Official Badge in {userData.verifiedSkill}</p>
-                </div>
+        <div className="relative overflow-hidden rounded-[32px] p-8 lg:p-10 flex flex-col md:flex-row items-center justify-between gap-8 border border-[#129780]/30 shadow-2xl shadow-[#129780]/10 bg-gradient-to-br from-[#129780] via-[#0f806c] to-[#0a5c4d] text-white group">
+          <div className="absolute -top-32 -right-32 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none group-hover:bg-white/20 transition-all duration-700"></div>
+          <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-black/10 rounded-full blur-3xl pointer-events-none"></div>
+          
+          <div className="relative z-10 flex items-center gap-6">
+            <div className="w-16 h-16 shrink-0 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-inner border border-white/20">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-white drop-shadow-md"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            </div>
+            <div>
+              <div className="flex items-center gap-3 mb-1">
+                <h3 className="text-2xl lg:text-3xl font-black tracking-tight drop-shadow-sm">Verified Expert</h3>
+                <span className="px-2.5 py-1 rounded-md bg-white/20 text-white text-[10px] font-black tracking-widest uppercase drop-shadow-sm">Elite Status</span>
               </div>
-              <div className="bg-white/20 backdrop-blur-md px-6 py-3 rounded-full border border-white/20">
-                <span className="text-sm font-bold tracking-tight">Trust Level: Elite</span>
-              </div>
-           </div>
-        </Card>
+              <p className="text-white/80 font-bold text-sm lg:text-base tracking-wide uppercase drop-shadow-sm">Official Badge in {userData.verifiedSkill}</p>
+            </div>
+          </div>
+          
+          <div className="relative z-10 shrink-0">
+            <div className="bg-white text-[#129780] px-6 py-3 rounded-full font-black text-sm shadow-xl shadow-black/10 hover:scale-105 transition-transform cursor-default">
+              Trust Level: 100%
+            </div>
+          </div>
+        </div>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 items-start">

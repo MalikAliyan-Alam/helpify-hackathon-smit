@@ -63,14 +63,19 @@ export function CreateRequestPage() {
   return (
     <div className="flex flex-col gap-8 pb-12">
       {/* Header */}
-      <div className="bg-[var(--hero-bg)] rounded-[24px] p-10 flex flex-col text-[var(--hero-text)]">
-        <p className="opacity-60 font-bold text-xs uppercase tracking-wider mb-4">CREATE REQUEST</p>
-        <h1 className="text-4xl lg:text-5xl font-bold tracking-tight mb-4 max-w-2xl">
-          Turn a rough problem into a clear help request.
-        </h1>
-        <p className="opacity-80 text-lg max-w-xl">
-          Use built-in AI suggestions for category, urgency, tags, and a stronger description rewrite.
-        </p>
+      <div className="relative overflow-hidden rounded-[32px] p-10 lg:p-14 flex flex-col shadow-xl shadow-[var(--shadow)] border border-[var(--border-color)] group" style={{ background: 'var(--hero-gradient)' }}>
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-[var(--accent)] opacity-10 blur-[100px] rounded-full group-hover:opacity-20 transition-opacity duration-1000"></div>
+        <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-orange-500 opacity-[0.03] blur-[100px] rounded-full"></div>
+        
+        <div className="relative z-10">
+          <p className="opacity-60 font-black text-[10px] uppercase tracking-[0.3em] mb-4 text-[var(--hero-text)]">CREATE REQUEST</p>
+          <h1 className="text-4xl lg:text-[64px] font-black tracking-tighter mb-4 text-[var(--hero-text)] leading-[1.1] max-w-2xl">
+            Turn a rough problem into a clear help request.
+          </h1>
+          <p className="opacity-70 text-lg lg:text-xl max-w-xl text-[var(--hero-text)] font-medium leading-relaxed">
+            Use built-in AI suggestions for category, urgency, tags, and a stronger description rewrite.
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 items-start">

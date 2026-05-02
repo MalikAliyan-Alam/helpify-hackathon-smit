@@ -14,6 +14,7 @@ export function Navbar() {
   const navigate = useNavigate();
   const { currentUser, logout, userData } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   useEffect(() => {
     if (!currentUser) {
@@ -105,11 +106,24 @@ export function Navbar() {
   }
 
   return (
-    <nav className="sticky top-0 z-[100] bg-[var(--glass-bg)] backdrop-blur-xl border-b border-[var(--glass-border)] px-6 py-3 transition-all duration-300">
+    <nav className="sticky top-0 z-[100] bg-[var(--glass-bg)] backdrop-blur-xl border-b border-[var(--glass-border)] px-4 md:px-6 py-3 transition-all duration-300 w-full max-w-[100vw]">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
         {/* Logo Section - flex-1 to push nav to center */}
-        <div className="flex-1 flex justify-start">
-          <Link to="/" className="flex items-center gap-3 group">
+        <div className="flex-1 flex justify-start items-center gap-1 md:gap-2">
+          {/* Hamburger Menu Toggle (Mobile) */}
+          <button 
+            className="lg:hidden p-2 -ml-2 rounded-xl text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] transition-colors"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle Navigation"
+          >
+            {isMobileMenuOpen ? (
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="18" x2="20" y2="18"></line></svg>
+            )}
+          </button>
+
+          <Link to="/" className="flex items-center gap-2 md:gap-3 group">
             <div className="relative w-10 h-10 flex items-center justify-center">
               {/* Logo: Isometric Stack */}
               <div className="relative w-7 h-7 transform -rotate-12 group-hover:rotate-0 transition-transform duration-500">
@@ -147,19 +161,21 @@ export function Navbar() {
              <div className="relative group px-4 py-2 text-sm font-bold text-[var(--text-secondary)] cursor-pointer hover:text-[var(--text-primary)] flex items-center gap-1">
                 More
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-                <div className="absolute top-full left-0 mt-2 w-48 bg-[var(--bg-card)] rounded-2xl shadow-2xl border border-[var(--border-color)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all py-2 z-50">
-                   {displayedLinks.slice(3).map((link) => (
-                     <Link key={link.name} to={link.path} className="block px-6 py-2.5 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--accent)]">
-                        {link.name}
-                     </Link>
-                   ))}
+                <div className="absolute top-full left-0 pt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                   <div className="bg-[var(--bg-card)] rounded-2xl shadow-2xl border border-[var(--border-color)] py-2">
+                     {displayedLinks.slice(3).map((link) => (
+                       <Link key={link.name} to={link.path} className="block px-6 py-2.5 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--accent)]">
+                          {link.name}
+                       </Link>
+                     ))}
+                   </div>
                 </div>
              </div>
           )}
         </div>
 
         {/* Right Actions Cluster */}
-        <div className="flex-1 flex justify-end items-center gap-3">
+        <div className="flex-1 flex justify-end items-center gap-2 md:gap-3">
           {/* Theme Toggle - Visible to All */}
           <button 
             onClick={toggleTheme}
@@ -175,13 +191,7 @@ export function Navbar() {
 
           {currentUser ? (
             <>
-              {/* Streak */}
-              {userData?.currentStreak > 0 && (
-                <div className="flex items-center gap-1.5 bg-orange-50 text-orange-600 px-3 py-1.5 rounded-xl border border-orange-100 shadow-sm">
-                  <span className="text-sm">🔥</span>
-                  <span className="text-xs font-black">{userData.currentStreak}</span>
-                </div>
-              )}
+
 
 
               {/* Notifications Icon */}
@@ -205,10 +215,12 @@ export function Navbar() {
                  <div className="w-10 h-10 rounded-xl bg-[var(--bg-card)] border-2 border-[var(--border-color)] shadow-md flex items-center justify-center text-[var(--text-primary)] font-bold cursor-pointer hover:scale-105 transition-transform overflow-hidden">
                     {userData?.avatar ? <img src={userData.avatar} className="w-full h-full object-cover" /> : userData?.name?.charAt(0).toUpperCase() || 'U'}
                  </div>
-                 <div className="absolute top-full right-0 mt-2 w-48 bg-[var(--bg-card)] rounded-2xl shadow-2xl border border-[var(--border-color)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all py-2 z-50">
-                    <Link to="/profile" className="block px-6 py-2.5 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]">Settings</Link>
-                    <div className="h-px bg-[var(--border-color)] my-1 mx-4"></div>
-                    <button onClick={handleLogout} className="w-full text-left px-6 py-2.5 text-sm font-bold text-red-500 hover:bg-red-500/10 hover:text-red-600">Log out</button>
+                 <div className="absolute top-full right-0 pt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                    <div className="bg-[var(--bg-card)] rounded-2xl shadow-2xl border border-[var(--border-color)] py-2">
+                      <Link to="/profile" className="block px-6 py-2.5 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]">Settings</Link>
+                      <div className="h-px bg-[var(--border-color)] my-1 mx-4"></div>
+                      <button onClick={handleLogout} className="w-full text-left px-6 py-2.5 text-sm font-bold text-red-500 hover:bg-red-500/10 hover:text-red-600">Log out</button>
+                    </div>
                  </div>
               </div>
             </>
@@ -231,6 +243,27 @@ export function Navbar() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Mobile Navigation Dropdown */}
+      <div 
+        className={`lg:hidden absolute top-full left-0 w-full bg-[var(--bg-card)] border-b border-[var(--border-color)] shadow-[0_20px_40px_rgba(0,0,0,0.1)] py-4 px-6 flex flex-col gap-1 max-h-[80vh] overflow-y-auto z-[200] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] origin-top ${
+          isMobileMenuOpen ? 'opacity-100 scale-y-100 translate-y-0 visible' : 'opacity-0 scale-y-95 -translate-y-4 invisible pointer-events-none'
+        }`}
+      >
+        {displayedLinks.map((link) => {
+          const isActive = location.pathname === link.path;
+          return (
+            <Link
+              key={link.name}
+              to={link.path}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={`px-4 py-3.5 rounded-xl text-base font-bold transition-all ${isActive ? 'bg-[var(--bg-secondary)] text-[var(--accent)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)]/50'}`}
+            >
+              {link.name}
+            </Link>
+          );
+        })}
       </div>
     </nav>
   );

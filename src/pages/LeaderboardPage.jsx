@@ -161,13 +161,13 @@ export function LeaderboardPage() {
             return (
               <Card 
                 key={user.id} 
-                className={`border-none shadow-sm rounded-[24px] p-4 flex items-center gap-6 transition-all hover:shadow-md hover:scale-[1.01] ${isMe ? 'ring-2 ring-[var(--accent)] bg-[var(--badge-green-bg)]' : ''}`}
+                className={`border-none shadow-sm rounded-[24px] p-3 md:p-4 flex items-center gap-3 md:gap-6 transition-all hover:shadow-md hover:scale-[1.01] overflow-hidden ${isMe ? 'ring-2 ring-[var(--accent)] bg-[var(--badge-green-bg)]' : ''}`}
               >
-                <div className={`w-12 text-center ${rankStyle}`}>
+                <div className={`w-8 md:w-12 text-center shrink-0 ${rankStyle}`}>
                   {getRankBadge(index)}
                 </div>
 
-                <div className="w-12 h-12 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-color)] flex items-center justify-center text-[var(--text-primary)] font-bold shrink-0 relative">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-color)] flex items-center justify-center text-[var(--text-primary)] font-bold shrink-0 relative">
                   {user.name?.charAt(0).toUpperCase()}
                   {user.verified && (
                     <div className="absolute -bottom-1 -right-1 bg-[var(--accent)] text-white p-0.5 rounded-full border-2 border-[var(--bg-card)]">
@@ -176,35 +176,37 @@ export function LeaderboardPage() {
                   )}
                 </div>
 
-                <div className="flex-1">
-                  <div className="flex items-center gap-3">
-                    <h4 className="font-bold text-[var(--text-primary)] truncate">{user.name}</h4>
-                    <div className="flex gap-1.5 shrink-0">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center flex-wrap gap-1.5 md:gap-3">
+                    <h4 className="font-bold text-[var(--text-primary)] truncate max-w-[90px] sm:max-w-[150px] md:max-w-none">{user.name}</h4>
+                    <div className="flex gap-1 shrink-0">
                       {user.pinnedBadges?.map(id => (
-                        <span key={id} title={BADGE_DEFINITIONS[id]?.name} className="text-sm w-6 h-6 flex items-center justify-center bg-[var(--bg-secondary)] backdrop-blur-sm rounded-full shadow-sm border border-[var(--border-color)] text-[var(--text-primary)]">
+                        <span key={id} title={BADGE_DEFINITIONS[id]?.name} className="text-xs w-5 h-5 md:w-6 md:h-6 flex items-center justify-center bg-[var(--bg-secondary)] backdrop-blur-sm rounded-full shadow-sm border border-[var(--border-color)] text-[var(--text-primary)]">
                           {BADGE_DEFINITIONS[id]?.icon}
                         </span>
                       ))}
                     </div>
                     {currentUser && user.id !== currentUser.uid && (
-                      <KudosButton 
-                        targetUserId={user.id} 
-                        messageId={`profile-${user.id}`} 
-                        kudosGiven={user.kudosVoters || []} 
-                        currentKudos={user.kudosCount || 0}
-                      />
+                      <div className="shrink-0 scale-90 md:scale-100 origin-left">
+                        <KudosButton 
+                          targetUserId={user.id} 
+                          messageId={`profile-${user.id}`} 
+                          kudosGiven={user.kudosVoters || []} 
+                          currentKudos={user.kudosCount || 0}
+                        />
+                      </div>
                     )}
-                    {currentUser && isMe && <span className="bg-[#129780] text-white text-[8px] font-black uppercase px-2 py-0.5 rounded-full">YOU</span>}
+                    {currentUser && isMe && <span className="bg-[#129780] text-white text-[8px] font-black uppercase px-2 py-0.5 rounded-full shrink-0">YOU</span>}
                   </div>
-                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                  <p className="text-[9px] md:text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5 truncate">
                     {user.verifiedSkill || 'Community Helper'}
                   </p>
                 </div>
 
-                <div className="flex items-center gap-8 pr-4">
+                <div className="flex items-center gap-3 md:gap-8 pr-1 md:pr-4 shrink-0">
                   <div className="text-center">
-                    <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase mb-0.5">Trust</p>
-                    <p className="text-sm font-black text-[var(--accent)]">{Math.min(100, user.trustScore || 0)}%</p>
+                    <p className="text-[8px] md:text-[10px] text-[var(--text-secondary)] font-bold uppercase mb-0.5">Trust</p>
+                    <p className="text-xs md:text-sm font-black text-[var(--accent)]">{Math.min(100, user.trustScore || 0)}%</p>
                   </div>
                   <div className="text-center hidden sm:block">
                     <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase mb-0.5">Helps</p>
